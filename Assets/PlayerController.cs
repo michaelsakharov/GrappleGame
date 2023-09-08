@@ -77,7 +77,8 @@ public class PlayerController : MonoBehaviour
             RestartLevel();
 
         float hor = Input.GetAxis("Horizontal");
-        moveDir = new Vector2(hor, 0).normalized;
+        float ver = Input.GetAxis("Vertical");
+        moveDir = new Vector2(hor, ver).normalized;
 
         // check isGrounded
         isGrounded = CheckIsGrounded();
