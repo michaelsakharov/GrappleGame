@@ -5058,8 +5058,9 @@ MonoBehaviour:
   grappleIcon: {fileID: 8142213470927386959}
   grappleSpeed: 80
   grappleGravity: 9
-  grappleDrag: 0.99
-  grappleForce: 25
+  grappleGravityDelay: 0.1
+  grappleDrag: 1
+  grappleForce: 22
   groundLayer:
     serializedVersion: 2
     m_Bits: 384
@@ -5068,9 +5069,9 @@ MonoBehaviour:
   playerWidth: 0.5
   groundedRayHeightOffset: -0.25
   canBeGroundedWhileHooked: 0
-  groundSpeed: 8
+  groundSpeed: 13
   groundDrag: 2
-  aidSpeed: 5
+  aidSpeed: 13
   airDrag: 0
 --- !u!1 &8142213471971868136
 GameObject:
