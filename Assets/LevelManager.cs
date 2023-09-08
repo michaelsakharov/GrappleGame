@@ -41,4 +41,9 @@ public class LevelManager : MonoBehaviour
         // load the last completed level
         SceneManager.LoadScene(lastPlayed);
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

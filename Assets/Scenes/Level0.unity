@@ -2385,10 +2385,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1193629883, guid: 60469992b11d5434b9cc1e53c586ce19, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8142213471756539345, guid: 60469992b11d5434b9cc1e53c586ce19, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -2436,10 +2432,6 @@ PrefabInstance:
     - target: {fileID: 8142213471756539356, guid: 60469992b11d5434b9cc1e53c586ce19, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 8142213471756539357, guid: 60469992b11d5434b9cc1e53c586ce19, type: 3}
-      propertyPath: grappleGravityDelay
-      value: 0.15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 60469992b11d5434b9cc1e53c586ce19, type: 3}
