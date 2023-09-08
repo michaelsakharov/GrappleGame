@@ -5056,8 +5056,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 320
   grappleIcon: {fileID: 8142213470927386959}
-  grappleSpeed: 80
+  grappleSpeed: 75
   grappleGravity: 9
+  grappleGravityDelay: 0.1
   grappleDrag: 0.99
   grappleForce: 25
   groundLayer:
