@@ -179,16 +179,34 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        var interactor = collision.gameObject.GetComponent<IPlayerInteractor>();
+        var interactor = collision.gameObject.GetComponents<IPlayerInteractor>();
         if (interactor != null)
-            interactor.Interact(this, collision.contacts.FirstOrDefault());
+            foreach (var i in interactor)
+                i.Interact(this, collision.contacts.FirstOrDefault());
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        var interactor = collision.gameObject.GetComponent<IPlayerInteractor>();
+        var interactor = collision.gameObject.GetComponents<IPlayerInteractor>();
         if (interactor != null)
-            interactor.OnLeave(this);
+            foreach (var i in interactor)
+                i.OnLeave(this);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        var interactor = collision.gameObject.GetComponents<IPlayerInteractor>();
+        if (interactor != null)
+            foreach (var i in interactor)
+                i.TriggerInteract(this);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        var interactor = collision.gameObject.GetComponents<IPlayerInteractor>();
+        if (interactor != null)
+            foreach (var i in interactor)
+                i.OnLeave(this);
     }
 
     #region States
