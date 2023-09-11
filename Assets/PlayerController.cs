@@ -54,6 +54,8 @@ public class PlayerController : MonoBehaviour
     public enum PlayerState { Idle, Hooked, Shooting, Dead }
     PlayerState state = PlayerState.Idle;
 
+    public Dictionary<object, float> gravityScalers = new Dictionary<object, float>();
+    public Dictionary<object, float> dragAdders = new Dictionary<object, float>();
 
     public bool IsGrounded => isGrounded;
     public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }
@@ -130,11 +132,17 @@ public class PlayerController : MonoBehaviour
             activeInteractor = null;
         }
 
+        float gravityScale = 1f;
+        foreach (float f in gravityScalers.Values)
+            gravityScale *= f;
+        rb.gravityScale = gravityScale;
+
     }
 
     void FixedUpdate()
     {
         rb.drag = isGrounded ? groundDrag : airDrag;
+        rb.drag += dragAdders.Values.Sum();
         rb.AddForce(moveDir * (isGrounded ? groundSpeed : aidSpeed));
 
         if (state == PlayerState.Hooked) // Is Hooked
