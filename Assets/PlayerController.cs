@@ -9,6 +9,9 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
+
+    public static PlayerController Instance { get; private set; }
+
     [Header("Visual")]
     public GameObject visual;
     public GameObject deathEffect;
@@ -69,6 +72,11 @@ public class PlayerController : MonoBehaviour
     public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }
     public Vector2 GrappleDirection { get => grappleShootDir; set => grappleShootDir = value; }
     public Vector2 Velocity { get => rb.velocity; set => rb.velocity = value; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
