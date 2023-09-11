@@ -10,5 +10,7 @@ public class PlayerBounce : IPlayerInteractor
         player.Velocity += hit.normal * hit.normalImpulse * (1.0f + bounceForce);
     }
 
+    public override void TriggerInteract(PlayerController player) { }
+
     public override void OnLeave(PlayerController player) { }
 }

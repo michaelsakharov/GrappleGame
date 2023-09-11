@@ -7,5 +7,10 @@ public class PlayerKiller : IPlayerInteractor
         player.Kill();
     }
 
+    public override void TriggerInteract(PlayerController player)
+    {
+        player.Kill();
+    }
+
     public override void OnLeave(PlayerController player) { }
 }
