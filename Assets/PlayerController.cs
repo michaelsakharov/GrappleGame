@@ -16,8 +16,10 @@ public class PlayerController : MonoBehaviour
     public GameObject visual;
     public GameObject deathEffect;
     public TMPro.TMP_Text levelTimerText;
+    public TMPro.TMP_Text bestLevelTimerText;
     public GameObject levelFinishUI;
     public TMPro.TMP_Text finishLevelTimerText;
+    public TMPro.TMP_Text bestFinishLevelTimerText;
 
     [Header("Grapple")]
     public LayerMask grappleLayer;
@@ -58,6 +60,7 @@ public class PlayerController : MonoBehaviour
     float shotTimer = 0f;
 
     float levelTimer = 0f;
+    float bestTimer = 0f;
     string nextlvl = "";
 
     public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished }
@@ -65,6 +68,7 @@ public class PlayerController : MonoBehaviour
 
     public Dictionary<object, float> gravityScalers = new Dictionary<object, float>();
     public Dictionary<object, float> dragAdders = new Dictionary<object, float>();
+    public Stack<bool> canGrapple = new Stack<bool>();
 
 
     public Rigidbody2D Rigidbody => rb;
@@ -87,14 +91,19 @@ public class PlayerController : MonoBehaviour
         line.enabled = false;
 
         rb = GetComponent<Rigidbody2D>();
+
+        // load best timer
+        bestTimer = PlayerPrefs.GetFloat("BestTime_" + SceneManager.GetActiveScene().name, 0f);
     }
 
     void Update()
     {
         if (state != PlayerState.Finished)
             levelTimer += Time.deltaTime;
-        levelTimerText.text = TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
-        finishLevelTimerText.text = TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
+        levelTimerText.text = "Time:" + TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
+        bestLevelTimerText.text = "Best:" + TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
+        finishLevelTimerText.text = "Time:" + TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
+        bestFinishLevelTimerText.text = "Best:" + TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
 
         if (Input.GetKeyDown(KeyCode.R))
             RestartLevel();
@@ -129,6 +138,13 @@ public class PlayerController : MonoBehaviour
 
         if (state == PlayerState.Shooting || state == PlayerState.Hooked)
         {
+            // if cant grapple
+            if (canGrapple.Count > 0 && !canGrapple.Peek())
+            {
+                state = PlayerState.Idle;
+                line.enabled = false;
+            }
+
             line.enabled = true;
             line.SetPosition(0, transform.position);
             line.SetPosition(1, grapplePoint);
@@ -251,13 +267,16 @@ public class PlayerController : MonoBehaviour
 
     void IsIdleLogic()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (canGrapple.Count == 0 || canGrapple.Peek())
         {
-            // start shooting
-            grappleShootDir = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized * grappleSpeed;
-            grapplePoint = this.transform.position;
-            state = PlayerState.Shooting;
-            shotTimer = 0f;
+            if (Input.GetMouseButtonDown(0))
+            {
+                // start shooting
+                grappleShootDir = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized * grappleSpeed;
+                grapplePoint = this.transform.position;
+                state = PlayerState.Shooting;
+                shotTimer = 0f;
+            }
         }
     }
 
@@ -358,6 +377,14 @@ public class PlayerController : MonoBehaviour
         Invoke(nameof(LoadNextLevel), 2f);
 
         levelFinishUI.SetActive(true);
+
+        // update best timer
+        var bestTime = PlayerPrefs.GetFloat("BestTime_" + SceneManager.GetActiveScene().name, float.MaxValue);
+        if (bestTime > levelTimer)
+        {
+            PlayerPrefs.SetFloat("BestTime_" + SceneManager.GetActiveScene().name, levelTimer);
+            bestTime = levelTimer;
+        }
 
         // Stop all player motion
         rb.isKinematic = true;
