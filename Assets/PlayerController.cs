@@ -63,6 +63,8 @@ public class PlayerController : MonoBehaviour
     public Dictionary<object, float> gravityScalers = new Dictionary<object, float>();
     public Dictionary<object, float> dragAdders = new Dictionary<object, float>();
 
+
+    public Rigidbody2D Rigidbody => rb;
     public bool IsGrounded => isGrounded;
     public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }
     public Vector2 GrappleDirection { get => grappleShootDir; set => grappleShootDir = value; }
