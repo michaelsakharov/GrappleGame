@@ -12,6 +12,9 @@ public class PlayerController : MonoBehaviour
     [Header("Visual")]
     public GameObject visual;
     public GameObject deathEffect;
+    public TMPro.TMP_Text levelTimerText;
+    public GameObject levelFinishUI;
+    public TMPro.TMP_Text finishLevelTimerText;
 
     [Header("Grapple")]
     public LayerMask grappleLayer;
@@ -51,7 +54,10 @@ public class PlayerController : MonoBehaviour
     float noIsGroundedTimer = 0f;
     float shotTimer = 0f;
 
-    public enum PlayerState { Idle, Hooked, Shooting, Dead }
+    float levelTimer = 0f;
+    string nextlvl = "";
+
+    public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished }
     PlayerState state = PlayerState.Idle;
 
     public Dictionary<object, float> gravityScalers = new Dictionary<object, float>();
@@ -75,6 +81,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (state != PlayerState.Finished)
+            levelTimer += Time.deltaTime;
+        levelTimerText.text = TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
+        finishLevelTimerText.text = TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
+
         if (Input.GetKeyDown(KeyCode.R))
             RestartLevel();
 
@@ -100,6 +111,10 @@ public class PlayerController : MonoBehaviour
         else if(state == PlayerState.Dead)
         {
             moveDir = Vector2.zero; // stop moving were ded :(
+        }
+        else if(state == PlayerState.Finished)
+        {
+            moveDir = Vector2.zero;
         }
 
         if (state == PlayerState.Shooting || state == PlayerState.Hooked)
@@ -183,6 +198,11 @@ public class PlayerController : MonoBehaviour
     void RestartLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void LoadNextLevel()
+    {
+        SceneManager.LoadScene(nextlvl);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -315,6 +335,19 @@ public class PlayerController : MonoBehaviour
 
         visual.SetActive(false);
         deathEffect.SetActive(true);
+
+        // Stop all player motion
+        rb.isKinematic = true;
+        rb.velocity = Vector2.zero;
+    }
+
+    public void FinishLevel(string nextLevel)
+    {
+        nextlvl = nextLevel;
+        state = PlayerState.Finished;
+        Invoke(nameof(LoadNextLevel), 2f);
+
+        levelFinishUI.SetActive(true);
 
         // Stop all player motion
         rb.isKinematic = true;
