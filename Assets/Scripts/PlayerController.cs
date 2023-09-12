@@ -214,8 +214,9 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.drag = isGrounded ? groundDrag : airDrag;
-        rb.drag += dragAdders.Values.Sum();
+        float drag = isGrounded ? groundDrag : airDrag;
+        drag += dragAdders.Values.Sum();
+        rb.drag = Mathf.Max(drag, 0.0f);
         rb.AddForce(moveDir * (isGrounded ? groundSpeed : aidSpeed));
 
         if (state == PlayerState.Hooked) // Is Hooked

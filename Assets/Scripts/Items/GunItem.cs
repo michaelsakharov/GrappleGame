@@ -1,17 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponType
-{
-    Projectile,
-    Raycast
-}
-public enum Auto
-{
-    Full,
-    Semi
-}
-
 /// <summary>
 /// This is the core script that is used to create weapons.  There are 3 basic
 /// types of weapons that can be made with this script:
@@ -21,12 +10,14 @@ public enum Auto
 /// 
 /// Projectile - Instantiates projectiles and lets them handle things like damage and accuracy.
 /// </summary>
-
-
 public class GunItem : ItemObject
 {
+    public enum WeaponType { Projectile, Raycast }
+    public enum Auto { Full, Semi }
+
+
     // Weapon Type
-    public WeaponType type = WeaponType.Projectile;     // Which weapon system should be used
+    public WeaponType type = WeaponType.Raycast;     // Which weapon system should be used
 
     // Auto
     public Auto auto = Auto.Full;                       // How does this weapon fire - semi-auto or full-auto
