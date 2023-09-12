@@ -10,6 +10,7 @@ public class GrappleUnityAction : IGrappleInteractor
 
     public override bool Interact(PlayerController player, RaycastHit2D hit)
     {
+        Debug.Log("Enter");
         action.Invoke();
         if(disconnect)
             player.SetState(PlayerController.PlayerState.Idle);
@@ -18,6 +19,7 @@ public class GrappleUnityAction : IGrappleInteractor
 
     public override void OnLeave(PlayerController player)
     {
+        Debug.Log("Leave");
         leaveaction.Invoke();
     }
 }

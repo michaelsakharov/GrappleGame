@@ -349,6 +349,8 @@ public class PlayerController : MonoBehaviour
             if (hit.collider.TryGetComponent<IGrappleInteractor>(out var interactor))
             {
                 attach = interactor.Interact(this, hit);
+                if (activeInteractor != null) // If we were attached to something else leave it
+                    activeInteractor.OnLeave(this);
                 activeInteractor = interactor;
 
                 if(state != PlayerState.Shooting)
@@ -374,9 +376,6 @@ public class PlayerController : MonoBehaviour
                 ropeJoint.distance = grappleDist;
                 ropeJoint.connectedBody = this.rb;
                 ropeJoint.maxDistanceOnly = true;
-                if (activeInteractor != null)
-                    activeInteractor.OnLeave(this);
-                activeInteractor = null;
                 DisableIsGrounded();
             }
         }
