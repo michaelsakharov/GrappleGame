@@ -384,8 +384,31 @@ public class GunItem : ItemObject
         lr.endColor = trailColor;
         lr.startWidth = trailWidth;
         lr.endWidth = trailWidth/2f;
-        lr.SetPosition(0, start);
-        lr.SetPosition(1, end);
+        //lr.SetPosition(0, start);
+        //lr.SetPosition(1, end);
+
+        int numberOfPoints = 8;
+        float wobbleAmount = 0.15f;
+        lr.positionCount = numberOfPoints;
+        var linePositions = new Vector3[numberOfPoints];
+
+        linePositions[0] = transform.position; // Start position
+        linePositions[numberOfPoints - 1] = end; // End position
+
+        for (int i = 1; i < numberOfPoints - 1; i++)
+        {
+            float t = i / (float)(numberOfPoints - 1);
+            Vector3 lerpedPosition = Vector3.Lerp(start, end, t);
+
+            // Add some randomness to the position
+            Vector3 randomOffset = Random.insideUnitSphere * wobbleAmount;
+            lerpedPosition += randomOffset;
+
+            linePositions[i] = lerpedPosition;
+        }
+
+        lr.SetPositions(linePositions);
+
         shotTrails.Add(lr);
     }
 
