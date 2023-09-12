@@ -21,6 +21,10 @@ public class PlayerController : MonoBehaviour
     public TMPro.TMP_Text finishLevelTimerText;
     public TMPro.TMP_Text bestFinishLevelTimerText;
 
+    [Header("Items")]
+    public LayerMask itemLayer;
+    public float itemPickupRange = 1f;
+
     [Header("Grapple")]
     public LayerMask grappleLayer;
     public Transform grappleIcon;
@@ -63,6 +67,9 @@ public class PlayerController : MonoBehaviour
     float bestTimer = 0f;
     string nextlvl = "";
 
+    [HideInInspector]
+    public ItemObject curItem;
+
     public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished }
     PlayerState state = PlayerState.Idle;
 
@@ -94,6 +101,8 @@ public class PlayerController : MonoBehaviour
 
         // load best timer
         bestTimer = PlayerPrefs.GetFloat("BestTime_" + SceneManager.GetActiveScene().name, 0f);
+
+        curItem = null;
     }
 
     void Update()
@@ -178,6 +187,29 @@ public class PlayerController : MonoBehaviour
             gravityScale *= f;
         rb.gravityScale = gravityScale;
 
+        // Look for item
+        if(curItem == null)
+        {
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, itemPickupRange, itemLayer);
+            foreach (Collider2D col in colliders)
+            {
+                ItemObject item = col.GetComponent<ItemObject>();
+                if (item != null && item.canPickup)
+                {
+                    curItem = item;
+                    curItem.Pickup(this);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (Input.GetButtonDown("ThrowItem"))
+            {
+                curItem.Throw((Vector2)(Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position).normalized);
+                curItem = null;
+            }
+        }
     }
 
     void FixedUpdate()
@@ -278,12 +310,18 @@ public class PlayerController : MonoBehaviour
                 shotTimer = 0f;
             }
         }
+        // Handle Item
+        if (curItem != null)
+            curItem.ItemUpdate();
     }
 
     void IsHookedLogic()
     {
         // update grapple dist to be minimum
         grappleDist = Mathf.Min(grappleDist, Vector2.Distance(transform.position, grapplePoint));
+        // Handle Item
+        if (curItem != null)
+            curItem.ItemUpdate();
     }
 
     void IsShootingLogic()
@@ -341,6 +379,9 @@ public class PlayerController : MonoBehaviour
                 DisableIsGrounded();
             }
         }
+        // Handle Item
+        if (curItem != null)
+            curItem.ItemUpdate();
     }
 
     #endregion
