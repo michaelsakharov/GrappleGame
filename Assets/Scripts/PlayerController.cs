@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,6 +34,8 @@ public class PlayerController : MonoBehaviour
     public float grappleGravityDelay = 0.25f;
     public float grappleDrag = 0.95f;
     public float grappleForce = 5f;
+    public MMF_Player GrappleLaunchFeedback;
+    public MMF_Player GrappleHitFeedback;
 
 
     [Header("Movement")]
@@ -48,6 +51,7 @@ public class PlayerController : MonoBehaviour
     [Header("Air")]
     public float aidSpeed = 5f;
     public float airDrag = 0.99f;
+    public MMF_Player LandFeedback;
 
 
     bool isGrounded = false;
@@ -244,7 +248,14 @@ public class PlayerController : MonoBehaviour
                 Vector2 rayOrigin = start + new Vector2(playerWidth / (groundedRayCount - 1) * i, 0f);
                 RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, groundedRayLength, groundLayer);
                 if (hit.collider != null)
+                {
+                    if(isGrounded == false)
+                    {
+                        // we just landed
+                        LandFeedback?.PlayFeedbacks();
+                    }
                     return true;
+                }
             }
         }
         else
@@ -308,7 +319,8 @@ public class PlayerController : MonoBehaviour
                 grappleShootDir = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized * grappleSpeed;
                 grapplePoint = this.transform.position;
                 state = PlayerState.Shooting;
-                shotTimer = 0f;
+                shotTimer = 0f; 
+                GrappleLaunchFeedback?.PlayFeedbacks();
             }
         }
         // Handle Item
@@ -377,6 +389,8 @@ public class PlayerController : MonoBehaviour
                 ropeJoint.connectedBody = this.rb;
                 ropeJoint.maxDistanceOnly = true;
                 DisableIsGrounded();
+
+                GrappleHitFeedback?.PlayFeedbacks();
             }
         }
         // Handle Item
