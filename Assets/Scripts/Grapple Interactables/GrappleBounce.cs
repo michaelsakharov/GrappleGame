@@ -7,8 +7,8 @@ public class GrappleBounce : IGrappleInteractor
 
     public override bool Interact(PlayerController player, RaycastHit2D hit)
     {
-        player.GrappleDirection = Vector2.Reflect(player.GrappleDirection, hit.normal);
-        player.GrappleDirection *= 1.0f + bounceForce;
+        player.GrappleShootDirection = Vector2.Reflect(player.GrappleShootDirection, hit.normal);
+        player.GrappleShootDirection *= 1.0f + bounceForce;
         return false; // Return false to indicate that the grapple should not attatch to this object
     }
 

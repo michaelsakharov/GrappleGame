@@ -84,8 +84,10 @@ public class PlayerController : MonoBehaviour
 
     public Rigidbody2D Rigidbody => rb;
     public bool IsGrounded => isGrounded;
+    public bool IsGrappling => state == PlayerState.Hooked || state == PlayerState.Shooting;
     public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }
-    public Vector2 GrappleDirection { get => grappleShootDir; set => grappleShootDir = value; }
+    public Vector2 GrappleShootDirection { get => grappleShootDir; set => grappleShootDir = value; }
+    public Vector2 GrappleDirection => (grapplePoint - (Vector2)transform.position).normalized;
     public Vector2 Velocity { get => rb.velocity; set => rb.velocity = value; }
 
     private void Awake()
