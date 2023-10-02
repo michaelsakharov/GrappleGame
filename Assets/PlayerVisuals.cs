@@ -80,7 +80,7 @@ public class PlayerVisuals : MonoBehaviour
         FixedUpdate();
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         // do Mirror set out scale to -1
         //if (PlayerController.Instance.IsGrappling)
@@ -119,29 +119,12 @@ public class PlayerVisuals : MonoBehaviour
             if (isFlipped)
                 lH.x *= -1;
 
-            ApplySpringPhysics(ref b, body, bodySpringStrength, 3);
-            ApplySpringPhysics(ref h, head, headSpringStrength);
-            ApplySpringPhysics(ref lF, leftFoot, limbSpringStrength);
-            ApplySpringPhysics(ref rF, rightFoot, limbSpringStrength);
-            ApplySpringPhysics(ref rH, rightHand, limbSpringStrength);
-            ApplySpringPhysics(ref lEMiddle, leftEarMiddle, earMiddleSpringStrength, 8);
-            ApplySpringPhysics(ref rEMiddle, rightEarMiddle, earMiddleSpringStrength, 8);
-            ApplySpringPhysics(ref lEEnd, leftEarEnd, earSpringStrength, 10);
-            ApplySpringPhysics(ref rEEnd, rightEarEnd, earSpringStrength, 10);
+            doBounce();
         }
         else if (!PlayerController.Instance.IsGrounded)
         {
             ApplySpringPhysics(ref lH, leftHand, limbSpringStrength);
-
-            ApplySpringPhysics(ref b, body, bodySpringStrength, 3);
-            ApplySpringPhysics(ref h, head, headSpringStrength);
-            ApplySpringPhysics(ref lF, leftFoot, limbSpringStrength);
-            ApplySpringPhysics(ref rF, rightFoot, limbSpringStrength);
-            ApplySpringPhysics(ref rH, rightHand, limbSpringStrength);
-            ApplySpringPhysics(ref lEMiddle, leftEarMiddle, earMiddleSpringStrength, 8);
-            ApplySpringPhysics(ref rEMiddle, rightEarMiddle, earMiddleSpringStrength, 8);
-            ApplySpringPhysics(ref lEEnd, leftEarEnd, earSpringStrength, 10);
-            ApplySpringPhysics(ref rEEnd, rightEarEnd, earSpringStrength, 10);
+            doBounce();
         }
         else if (PlayerController.Instance.IsGrounded)
         {
@@ -151,12 +134,54 @@ public class PlayerVisuals : MonoBehaviour
             rF = rightFoot;
             lH = leftHand;
             rH = rightHand;
+            if (PlayerController.Instance.IsHoldingItem)
+                HoldItem();
             lEMiddle = leftEarMiddle;
             rEMiddle = rightEarMiddle;
             lEEnd = leftEarEnd;
             rEEnd = rightEarEnd;
         }
 
+    }
+
+    void doBounce()
+    {
+        if (!PlayerController.Instance.IsHoldingItem)
+            ApplySpringPhysics(ref rH, rightHand, limbSpringStrength);
+        else
+            HoldItem();
+
+        ApplySpringPhysics(ref b, body, bodySpringStrength, 3);
+        ApplySpringPhysics(ref h, head, headSpringStrength);
+        ApplySpringPhysics(ref lF, leftFoot, limbSpringStrength);
+        ApplySpringPhysics(ref rF, rightFoot, limbSpringStrength);
+        ApplySpringPhysics(ref lEMiddle, leftEarMiddle, earMiddleSpringStrength, 8);
+        ApplySpringPhysics(ref rEMiddle, rightEarMiddle, earMiddleSpringStrength, 8);
+        ApplySpringPhysics(ref lEEnd, leftEarEnd, earSpringStrength, 10);
+        ApplySpringPhysics(ref rEEnd, rightEarEnd, earSpringStrength, 10);
+    }
+
+    void HoldItem()
+    {
+        rH = (PlayerController.Instance.ItemDirection.normalized * 8f);
+
+        Vector2 pixelSize = new Vector2(scale / res.x, scale / res.y);
+        Vector2 localOffset = new Vector2(rH.x * pixelSize.x, rH.y * pixelSize.y);
+        Vector2 worldSpacePosition = localOffset + (Vector2)transform.position;
+        // PlayerController.Instance.HeldItem.Offset
+        // thats the pivot point of the item
+        // so we need to offset the item to move the items Pivot/Offset to be the same as the hand
+        // its in local space to the item
+        var offset = PlayerController.Instance.HeldItem.Offset;
+        if (PlayerController.Instance.ItemDirection.x < 0)
+            offset.y *= -1;
+        Vector2 itemPivot = PlayerController.Instance.HeldItem.transform.TransformPoint(offset);
+        Vector2 itemOffset = itemPivot - (Vector2)PlayerController.Instance.HeldItem.transform.position;
+        PlayerController.Instance.HeldItem.transform.localPosition = localOffset - itemOffset;
+
+        // Flip this after for use in Rendering
+        if (isFlipped)
+            rH.x *= -1;
     }
 
     void FixedUpdate()

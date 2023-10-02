@@ -83,6 +83,9 @@ public class PlayerController : MonoBehaviour
 
 
     public Rigidbody2D Rigidbody => rb;
+    public bool IsHoldingItem => curItem != null;
+    public Vector2 ItemDirection => curItem.AimDirection;
+    public ItemObject HeldItem => curItem;
     public bool IsGrounded => isGrounded;
     public bool IsGrappling => state == PlayerState.Hooked || state == PlayerState.Shooting;
     public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }

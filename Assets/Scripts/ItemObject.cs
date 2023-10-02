@@ -10,6 +10,7 @@ public abstract class ItemObject : MonoBehaviour
     [NonSerialized] public bool canPickup = true;
 
     public GameObject visualObject;
+    public Vector2 Offset;
 
     public float ThrowForce = 4;
     public float ThrowAngularForce = 5;
