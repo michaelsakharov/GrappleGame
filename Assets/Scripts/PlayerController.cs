@@ -69,13 +69,14 @@ public class PlayerController : MonoBehaviour
 
     float levelTimer = 0f;
     float bestTimer = 0f;
+    bool doTimer = false;
     string nextlvl = "";
 
     [HideInInspector]
     public ItemObject curItem;
 
-    public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished, Paused }
-    PlayerState state = PlayerState.Paused;
+    public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished }
+    PlayerState state = PlayerState.Idle;
 
     public Dictionary<object, float> gravityScalers = new Dictionary<object, float>();
     public Dictionary<object, float> dragAdders = new Dictionary<object, float>();
@@ -118,8 +119,15 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (state != PlayerState.Finished && state != PlayerState.Paused)
+        float hor = Input.GetAxis("Horizontal");
+        float ver = Input.GetAxis("Vertical");
+        moveDir = new Vector2(hor, ver).normalized;
+
+        if (state != PlayerState.Finished && doTimer)
             levelTimer += Time.deltaTime;
+        else
+            if (hor != 0 || ver != 0 || state != PlayerState.Idle) doTimer = true;
+
         levelTimerText.text = "Time:" + TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
         bestLevelTimerText.text = "Best:" + TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
         finishLevelTimerText.text = "Time:" + TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
@@ -128,18 +136,9 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
             RestartLevel();
 
-        float hor = Input.GetAxis("Horizontal");
-        float ver = Input.GetAxis("Vertical");
-        moveDir = new Vector2(hor, ver).normalized;
-
         // check isGrounded
         isGrounded = CheckIsGrounded();
 
-        if (state == PlayerState.Paused)
-        {
-            if (hor != 0 || ver != 0) state = PlayerState.Idle;
-            IsIdleLogic();
-        }
         if (state == PlayerState.Idle) // Is Idle
         {
             IsIdleLogic();
