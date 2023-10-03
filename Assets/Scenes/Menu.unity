@@ -3884,7 +3884,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualObject: {fileID: 208718167}
-  Offset: {x: 0.35, y: -0.05}
+  Offset: {x: -0.03, y: -0.05}
   ThrowForce: 5
   ThrowAngularForce: 5
   type: 1
@@ -16497,7 +16497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualObject: {fileID: 2193036740069022554}
-  Offset: {x: 0.3, y: -0.07}
+  Offset: {x: -0.1, y: -0.07}
   ThrowForce: 5
   ThrowAngularForce: 5
   type: 1
