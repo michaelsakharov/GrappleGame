@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour
     float grappleDist = -1;
     GameObject hookpointGO;
     DistanceJoint2D ropeJoint;
-    LineRenderer line;
+    internal LineRenderer line;
     Rigidbody2D rb;
     IGrappleInteractor activeInteractor;
     float noIsGroundedTimer = 0f;
@@ -92,6 +92,8 @@ public class PlayerController : MonoBehaviour
     public Vector2 GrappleShootDirection { get => grappleShootDir; set => grappleShootDir = value; }
     public Vector2 GrappleDirection => (grapplePoint - (Vector2)transform.position).normalized;
     public Vector2 Velocity { get => rb.velocity; set => rb.velocity = value; }
+
+    public event Action<Vector2> OnImpact;
 
     private void Awake()
     {
@@ -282,6 +284,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if(!IsGrounded)
+            if(collision.relativeVelocity.magnitude > 0.5)
+                OnImpact?.Invoke(collision.relativeVelocity);
+
         var interactor = collision.gameObject.GetComponents<IPlayerInteractor>();
         if (interactor != null)
             foreach (var i in interactor)

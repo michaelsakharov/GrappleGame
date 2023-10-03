@@ -1,5 +1,7 @@
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Unity.VisualScripting.Member;
 using static UnityEditor.PlayerSettings;
 
 [ExecuteAlways]
@@ -54,6 +56,7 @@ public class PlayerVisuals : MonoBehaviour
     Vector2 prevPos = Vector2.zero;
     Vector2 vel = Vector2.zero;
     bool isFlipped = false;
+    bool hasHooked = false;
 
     private void OnValidate()
     {
@@ -82,6 +85,10 @@ public class PlayerVisuals : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (PlayerController.Instance == null) return;
+        if (!hasHooked)
+            PlayerController.Instance.OnImpact += OnImpact;
+
         // do Mirror set out scale to -1
         //if (PlayerController.Instance.IsGrappling)
         //{
@@ -116,6 +123,12 @@ public class PlayerVisuals : MonoBehaviour
         {
             // Set hand to be at some point along the Grappling direction
             lH = (PlayerController.Instance.GrappleDirection.normalized * 8f);
+
+            Vector2 pixelSize = new Vector2(scale / res.x, scale / res.y);
+            Vector2 localOffset = new Vector2(lH.x * pixelSize.x, lH.y * pixelSize.y) / 2f;
+            Vector2 worldSpacePosition = localOffset + (Vector2)transform.position;
+            PlayerController.Instance.line.SetPosition(0, worldSpacePosition);
+
             if (isFlipped)
                 lH.x *= -1;
 
@@ -144,6 +157,23 @@ public class PlayerVisuals : MonoBehaviour
 
     }
 
+    private void OnImpact(Vector2 vel)
+    {
+        if (isFlipped)
+            vel.x *= -1;
+
+        AddForceToLimb(ref b, body, vel, 3, 3);
+        AddForceToLimb(ref h, head, vel, 6, 3);
+        AddForceToLimb(ref lF, leftFoot, vel);
+        AddForceToLimb(ref rF, rightFoot, vel);
+        AddForceToLimb(ref lH, leftHand, vel);
+        AddForceToLimb(ref rH, rightHand, vel);
+        AddForceToLimb(ref lEMiddle, leftEarMiddle, vel, 8, 3);
+        AddForceToLimb(ref rEMiddle, rightEarMiddle, vel, 8, 3);
+        AddForceToLimb(ref lEEnd, leftEarEnd, vel, 10, 4);
+        AddForceToLimb(ref rEEnd, rightEarEnd, vel, 10, 4);
+    }
+
     void doBounce()
     {
         if (!PlayerController.Instance.IsHoldingItem)
@@ -151,14 +181,14 @@ public class PlayerVisuals : MonoBehaviour
         else
             HoldItem();
 
-        ApplySpringPhysics(ref b, body, bodySpringStrength, 3);
-        ApplySpringPhysics(ref h, head, headSpringStrength);
+        ApplySpringPhysics(ref b, body, bodySpringStrength, 3, 3);
+        ApplySpringPhysics(ref h, head, headSpringStrength, 6, 3);
         ApplySpringPhysics(ref lF, leftFoot, limbSpringStrength);
         ApplySpringPhysics(ref rF, rightFoot, limbSpringStrength);
-        ApplySpringPhysics(ref lEMiddle, leftEarMiddle, earMiddleSpringStrength, 8);
-        ApplySpringPhysics(ref rEMiddle, rightEarMiddle, earMiddleSpringStrength, 8);
-        ApplySpringPhysics(ref lEEnd, leftEarEnd, earSpringStrength, 10);
-        ApplySpringPhysics(ref rEEnd, rightEarEnd, earSpringStrength, 10);
+        ApplySpringPhysics(ref lEMiddle, leftEarMiddle, earMiddleSpringStrength, 8, 3);
+        ApplySpringPhysics(ref rEMiddle, rightEarMiddle, earMiddleSpringStrength, 8, 3);
+        ApplySpringPhysics(ref lEEnd, leftEarEnd, earSpringStrength, 10, 4);
+        ApplySpringPhysics(ref rEEnd, rightEarEnd, earSpringStrength, 10, 4);
     }
 
     void HoldItem()
@@ -166,8 +196,7 @@ public class PlayerVisuals : MonoBehaviour
         rH = (PlayerController.Instance.ItemDirection.normalized * 8f);
 
         Vector2 pixelSize = new Vector2(scale / res.x, scale / res.y);
-        Vector2 localOffset = new Vector2(rH.x * pixelSize.x, rH.y * pixelSize.y);
-        Vector2 worldSpacePosition = localOffset + (Vector2)transform.position;
+        Vector2 localOffset = new Vector2(rH.x * pixelSize.x, rH.y * pixelSize.y) / 2f;
         // PlayerController.Instance.HeldItem.Offset
         // thats the pivot point of the item
         // so we need to offset the item to move the items Pivot/Offset to be the same as the hand
@@ -190,7 +219,7 @@ public class PlayerVisuals : MonoBehaviour
         mat.SetTexture(matPropName, player);
     }
 
-    void ApplySpringPhysics(ref Vector2 limbPosition, Vector2 targetPosition, float springStrength, float maxDist = 6)
+    void ApplySpringPhysics(ref Vector2 limbPosition, Vector2 targetPosition, float springStrength, float maxHorDist = 6, float maxVertDist = 6)
     {
         Vector2 displacement = targetPosition - limbPosition;
 
@@ -207,14 +236,34 @@ public class PlayerVisuals : MonoBehaviour
         limbPosition += totalForce * Time.deltaTime;
         //limbPosition = Vector2.MoveTowards(limbPosition, targetPosition, totalForce.magnitude * Time.deltaTime);
 
-        float currentDistance = Vector2.Distance(limbPosition, targetPosition);
+        // Distance was split into horizontal and vertical
+        limbPosition = HandleMaxDist(limbPosition, targetPosition, maxHorDist, maxVertDist);
+    }
 
-        // If the current distance is greater than the maximum allowed distance, adjust pointA
-        if (currentDistance > maxDist)
+    void AddForceToLimb(ref Vector2 limbPosition, Vector2 targetPosition, Vector2 force, float maxHorDist = 6, float maxVertDist = 6)
+    {
+        // Update limb position based on the forces
+        limbPosition += force;
+
+        // Distance was split into horizontal and vertical
+        limbPosition = HandleMaxDist(limbPosition, targetPosition, maxHorDist, maxVertDist);
+    }
+
+    Vector2 HandleMaxDist(Vector2 limbPosition, Vector2 targetPosition, float maxHorDist, float maxVertDist)
+    {
+        if (Mathf.Abs(limbPosition.x - targetPosition.x) > maxHorDist)
         {
-            Vector2 direction = (targetPosition - limbPosition).normalized;
-            limbPosition = targetPosition - direction * maxDist;
+            float xDistToTargetSign = Mathf.Sign(limbPosition.x - targetPosition.x);
+            limbPosition.x = targetPosition.x + (maxHorDist * xDistToTargetSign);
+
         }
+        if (Mathf.Abs(limbPosition.y - targetPosition.y) > maxVertDist)
+        {
+            float yDistToTargetSign = Mathf.Sign(limbPosition.y - targetPosition.y);
+            limbPosition.y = targetPosition.y + (maxVertDist * yDistToTargetSign);
+        }
+
+        return limbPosition;
     }
 
     void UpdateTexture()
