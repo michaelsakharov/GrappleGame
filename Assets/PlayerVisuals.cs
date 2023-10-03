@@ -222,7 +222,7 @@ public class PlayerVisuals : MonoBehaviour
     void ApplySpringPhysics(ref Vector2 limbPosition, Vector2 targetPosition, float springStrength, float maxHorDist = 6, float maxVertDist = 6)
     {
         Vector2 displacement = targetPosition - limbPosition;
-        if (displacement.magnitude < 0.5)
+        if (displacement.magnitude < 1.5)
             displacement *= 0.0f;
 
         // Apply spring force

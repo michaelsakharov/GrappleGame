@@ -105,15 +105,22 @@ MonoBehaviour:
   leftHand: {x: 5, y: 0}
   rightHand: {x: -3, y: 0}
   LimbTex: {fileID: 2800000, guid: 3788db24a6da4c94b85830ea98b5ea10, type: 3}
-  leftEar: {x: 3, y: 11}
-  rightEar: {x: -2, y: 11}
-  EarTex: {fileID: 2800000, guid: 93d34e453ff5f1142ba9bee09a80cfdd, type: 3}
-  BottomEarTex: {fileID: 2800000, guid: 93d34e453ff5f1142ba9bee09a80cfdd, type: 3}
-  headSpringStrength: 0.1
-  limbSpringStrength: 0.1
-  bodySpringStrength: 0.05
+  leftEarRoot: {x: 2, y: 3}
+  rightEarRoot: {x: -3, y: 3}
+  leftEarMiddle: {x: 4, y: 13}
+  rightEarMiddle: {x: -1, y: 13}
+  leftEarEnd: {x: 5, y: 15}
+  rightEarEnd: {x: 0, y: 15}
+  EarTex: {fileID: 2800000, guid: 62c75496b09e56f42b1446113b6aeb33, type: 3}
+  BottomEarTex: {fileID: 2800000, guid: 62c75496b09e56f42b1446113b6aeb33, type: 3}
+  headSpringStrength: 10
+  earSpringStrength: 100
+  earMiddleSpringStrength: 10
+  limbSpringStrength: 10
+  bodySpringStrength: 5
   res: {x: 44, y: 56}
   scale: 4
+  angle: 0
   player: {fileID: 0}
   mat: {fileID: 2100000, guid: 7cd9ced201a57ca4ba325f889b38b649, type: 2}
   matPropName: _MainTex
