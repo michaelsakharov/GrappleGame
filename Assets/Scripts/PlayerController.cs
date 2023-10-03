@@ -74,8 +74,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public ItemObject curItem;
 
-    public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished }
-    PlayerState state = PlayerState.Idle;
+    public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished, Paused }
+    PlayerState state = PlayerState.Paused;
 
     public Dictionary<object, float> gravityScalers = new Dictionary<object, float>();
     public Dictionary<object, float> dragAdders = new Dictionary<object, float>();
@@ -118,7 +118,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (state != PlayerState.Finished)
+        if (state != PlayerState.Finished && state != PlayerState.Paused)
             levelTimer += Time.deltaTime;
         levelTimerText.text = "Time:" + TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
         bestLevelTimerText.text = "Best:" + TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
@@ -135,6 +135,11 @@ public class PlayerController : MonoBehaviour
         // check isGrounded
         isGrounded = CheckIsGrounded();
 
+        if (state == PlayerState.Paused)
+        {
+            if (hor != 0 || ver != 0) state = PlayerState.Idle;
+            IsIdleLogic();
+        }
         if (state == PlayerState.Idle) // Is Idle
         {
             IsIdleLogic();
