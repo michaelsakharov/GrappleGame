@@ -130,7 +130,7 @@ public class PlayerVisuals : MonoBehaviour
             Vector2 pixelSize = new Vector2(scale / res.x, scale / res.y);
             Vector2 localOffset = new Vector2(lH.x * pixelSize.x, lH.y * pixelSize.y) / 2f;
             Vector2 worldSpacePosition = localOffset + (Vector2)transform.position;
-            PlayerController.Instance.line.SetPosition(0, worldSpacePosition);
+            PlayerController.Instance.line.SetPosition(1, worldSpacePosition);
 
             if (isFlipped)
                 lH.x *= -1;
