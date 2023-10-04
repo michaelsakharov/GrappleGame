@@ -128,8 +128,8 @@ public class PlayerController : MonoBehaviour
         else
             if (hor != 0 || ver != 0 || state != PlayerState.Idle) doTimer = true;
 
-        levelTimerText.text = "Time:" + TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
-        bestLevelTimerText.text = "Best:" + TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
+        levelTimerText.text = TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
+        bestLevelTimerText.text = TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
         finishLevelTimerText.text = "Time:" + TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
         bestFinishLevelTimerText.text = "Best:" + TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
 
