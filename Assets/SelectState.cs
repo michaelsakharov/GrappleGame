@@ -33,7 +33,7 @@ public static class SelectState
     [EditorState(EditorState.Select, StateUpdate.Update)]
     public static void Update()
     {
-        if (!MouseOnRotationRing() && !MouseOnXScale() && !MouseOnYScale())
+        if (!MouseOnRotationRing())
         {
             var mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var hit = Physics2D.Raycast(mousePos, Vector2.zero);
@@ -191,12 +191,6 @@ public static class SelectState
             // Draw Rotation Gizmos
             float radius = Vector2.Distance(selectedRect.min, selectedRect.max) / 2f + 0.25f;
             Draw.Ring(selectedRect.center, Vector3.forward, radius, MouseOnRotationRing() ? Color.white : Color.magenta);
-
-            // Draw Scale Gizmos
-            var c = selectedRect.center;
-            var r = (radius + 0.2f);
-            //Draw.Disc(c + (Vector2.right * r), Vector3.forward, 0.1f, MouseOnXScale() ? Color.white : Color.red);
-            //Draw.Disc(c + (Vector2.up * r), Vector3.forward, 0.1f, MouseOnYScale() ? Color.white : Color.green);
         }
 
         if (isRectSelecting)
@@ -264,44 +258,6 @@ public static class SelectState
             var mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
             float distanceToCenter = Vector2.Distance(mousePos, selectedRect.center);
             return distanceToCenter > radius - 0.1f && distanceToCenter < radius + 0.1f;
-        }
-        return false;
-    }
-
-    public static bool MouseOnYScale()
-    {
-        if (selectedObjects.Count > 0)
-        {
-            float radius = Vector2.Distance(selectedRect.min, selectedRect.max) / 2f + 0.25f;
-            var mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            float distanceToCenter = Vector2.Distance(mousePos, selectedRect.center);
-
-            if(distanceToCenter > radius + 0.1f)
-            {
-                var c = selectedRect.center;
-                var r = (radius + 0.2f);
-                if (Vector2.Distance(c + (Vector2.up * r), mousePos) < 0.1f)
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    public static bool MouseOnXScale()
-    {
-        if (selectedObjects.Count > 0)
-        {
-            float radius = Vector2.Distance(selectedRect.min, selectedRect.max) / 2f + 0.25f;
-            var mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            float distanceToCenter = Vector2.Distance(mousePos, selectedRect.center);
-
-            if(distanceToCenter > radius + 0.1f)
-            {
-                var c = selectedRect.center;
-                var r = (radius + 0.2f);
-                if (Vector2.Distance(c + (Vector2.right * r), mousePos) < 0.1f)
-                    return true;
-            }
         }
         return false;
     }
