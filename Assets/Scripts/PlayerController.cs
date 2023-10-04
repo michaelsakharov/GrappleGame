@@ -105,8 +105,8 @@ public class PlayerController : MonoBehaviour
     {
         GameObject linGO = new GameObject("Line");
         line = linGO.AddComponent<LineRenderer>();
-        line.startWidth = 0.15f;
-        line.endWidth = 0.1f;
+        line.startWidth = 0.05f;
+        line.endWidth = 0.05f;
         line.enabled = false;
 
         rb = GetComponent<Rigidbody2D>();
