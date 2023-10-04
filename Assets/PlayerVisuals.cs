@@ -87,7 +87,10 @@ public class PlayerVisuals : MonoBehaviour
     {
         if (PlayerController.Instance == null) return;
         if (!hasHooked)
+        {
             PlayerController.Instance.OnImpact += OnImpact;
+            hasHooked = true;
+        }
 
         // do Mirror set out scale to -1
         //if (PlayerController.Instance.IsGrappling)

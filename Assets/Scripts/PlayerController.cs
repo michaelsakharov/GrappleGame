@@ -313,14 +313,14 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(!IsGrounded)
-            if(collision.relativeVelocity.magnitude > 0.5)
-                OnImpact?.Invoke(collision.relativeVelocity);
-
         var interactor = collision.gameObject.GetComponents<IPlayerInteractor>();
         if (interactor != null)
             foreach (var i in interactor)
                 i.Interact(this, collision.contacts.FirstOrDefault());
+
+        if (!IsGrounded)
+            if (collision.relativeVelocity.magnitude > 0.5)
+                OnImpact?.Invoke(collision.relativeVelocity);
     }
 
     private void OnCollisionExit2D(Collision2D collision)
