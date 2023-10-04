@@ -125,13 +125,9 @@ public class PlayerController : MonoBehaviour
 
         if (state != PlayerState.Finished && doTimer)
             levelTimer += Time.deltaTime;
-        else
-            if (hor != 0 || ver != 0 || state != PlayerState.Idle) doTimer = true;
+        else if (hor != 0 || ver != 0 || state != PlayerState.Idle) doTimer = true;
 
-        levelTimerText.text = TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
-        bestLevelTimerText.text = TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
-        finishLevelTimerText.text = "Time:" + TimeSpan.FromSeconds(levelTimer).ToString(@"hh\:mm\:ss\:fff");
-        bestFinishLevelTimerText.text = "Best:" + TimeSpan.FromSeconds(bestTimer).ToString(@"hh\:mm\:ss\:fff");
+        UpdateLevelTimers();
 
         if (Input.GetKeyDown(KeyCode.R))
             RestartLevel();
@@ -274,6 +270,35 @@ public class PlayerController : MonoBehaviour
             noIsGroundedTimer -= Time.deltaTime;
         }
         return false;
+    }
+
+    void UpdateLevelTimers()
+    {
+        TimeSpan timeSpan = TimeSpan.FromSeconds(levelTimer);
+        string levelTimerTextString = timeSpan.Hours > 0 ?
+            timeSpan.ToString(@"hh\:mm\:ss\:fff") :
+            timeSpan.ToString(@"mm\:ss\:fff");
+
+        TimeSpan bestTimeSpan = TimeSpan.FromSeconds(bestTimer);
+        string bestLevelTimerTextString = bestTimeSpan.Hours > 0 ?
+            bestTimeSpan.ToString(@"hh\:mm\:ss\:fff") :
+            bestTimeSpan.ToString(@"mm\:ss\:fff");
+
+        levelTimerText.text = levelTimerTextString;
+        bestLevelTimerText.text = bestLevelTimerTextString;
+
+        timeSpan = TimeSpan.FromSeconds(levelTimer);
+        string levelTimeText = timeSpan.TotalHours >= 1 ?
+            "Time: " + timeSpan.ToString(@"hh\:mm\:ss\:fff") :
+            "Time: " + timeSpan.ToString(@"mm\:ss\:fff");
+
+        bestTimeSpan = TimeSpan.FromSeconds(bestTimer);
+        string bestTimeText = bestTimeSpan.TotalHours >= 1 ?
+            "Best: " + bestTimeSpan.ToString(@"hh\:mm\:ss\:fff") :
+            "Best: " + bestTimeSpan.ToString(@"mm\:ss\:fff");
+
+        finishLevelTimerText.text = levelTimeText;
+        bestFinishLevelTimerText.text = bestTimeText;
     }
 
     void RestartLevel()
