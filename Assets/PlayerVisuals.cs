@@ -102,9 +102,9 @@ public class PlayerVisuals : MonoBehaviour
         //}
         //else
         {
-            if (PlayerController.Instance.Velocity.x < 0)
+            if (PlayerController.Instance.Velocity.x < -0.05)
                 isFlipped = true;
-            else if (PlayerController.Instance.Velocity.x > 0)
+            else if (PlayerController.Instance.Velocity.x > 0.05)
                 isFlipped = false;
         }
 
