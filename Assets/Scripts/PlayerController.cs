@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
     public float grappleForce = 5f;
     public MMF_Player GrappleLaunchFeedback;
     public MMF_Player GrappleHitFeedback;
+    public Material ropeMaterial;
 
 
     [Header("Movement")]
@@ -166,8 +167,10 @@ public class PlayerController : MonoBehaviour
             }
 
             line.enabled = true;
-            line.SetPosition(0, transform.position);
-            line.SetPosition(1, grapplePoint);
+            line.SetPosition(1, transform.position);
+            line.SetPosition(0, grapplePoint);
+            line.material = ropeMaterial;
+            line.textureMode = LineTextureMode.Tile;
             grappleIcon.transform.position = grapplePoint;
 
             // while shooting releasing the mouse will always cancel the shoot!

@@ -7107,6 +7107,7 @@ MonoBehaviour:
   grappleForce: 25
   GrappleLaunchFeedback: {fileID: 3804706410306469356}
   GrappleHitFeedback: {fileID: 8545095976345036418}
+  ropeMaterial: {fileID: 2100000, guid: 4a7f4e5f2f5d77740a601cd749f66153, type: 2}
   groundLayer:
     serializedVersion: 2
     m_Bits: 384
