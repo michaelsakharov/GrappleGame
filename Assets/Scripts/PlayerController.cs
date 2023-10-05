@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
     GameObject hookpointGO;
     DistanceJoint2D ropeJoint;
     internal LineRenderer line;
-    Rigidbody2D rb;
+    PhysicsBody body;
     IGrappleInteractor activeInteractor;
     float noIsGroundedTimer = 0f;
     float shotTimer = 0f;
@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
     public Stack<bool> canGrapple = new Stack<bool>();
 
 
-    public Rigidbody2D Rigidbody => rb;
+    public PhysicsBody PhysicalBody => body;
     public bool IsHoldingItem => curItem != null;
     public Vector2 ItemDirection => curItem.AimDirection;
     public ItemObject HeldItem => curItem;
@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour
     public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }
     public Vector2 GrappleShootDirection { get => grappleShootDir; set => grappleShootDir = value; }
     public Vector2 GrappleDirection => (grapplePoint - (Vector2)transform.position).normalized;
-    public Vector2 Velocity { get => rb.velocity; set => rb.velocity = value; }
+    public dVector2 Velocity { get => body.GetVelocity(); set => body.SetVelocity(value); }
 
     public event Action<Vector2> OnImpact;
 
@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour
         line.endWidth = 0.05f;
         line.enabled = false;
 
-        rb = GetComponent<Rigidbody2D>();
+        body = GetComponent<PhysicsBody>();
 
         // load best timer
         bestTimer = PlayerPrefs.GetFloat("BestTime_" + SceneManager.GetActiveScene().name, 0f);
