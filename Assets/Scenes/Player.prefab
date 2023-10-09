@@ -7103,7 +7103,8 @@ MonoBehaviour:
   grappleSpeed: 75
   grappleGravity: 9
   grappleGravityDelay: 0.1
-  grappleDrag: 0.99
+  grappleDrag: 10
+  grappleDragDelay: 0.075
   grappleForce: 25
   GrappleLaunchFeedback: {fileID: 3804706410306469356}
   GrappleHitFeedback: {fileID: 8545095976345036418}

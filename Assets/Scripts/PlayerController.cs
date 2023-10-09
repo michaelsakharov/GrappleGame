@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
     public float grappleGravity = 2f;
     public float grappleGravityDelay = 0.25f;
     public float grappleDrag = 0.95f;
+    public float grappleDragDelay = 0.25f;
     public float grappleForce = 5f;
     public MMF_Player GrappleLaunchFeedback;
     public MMF_Player GrappleHitFeedback;
@@ -58,7 +59,8 @@ public class PlayerController : MonoBehaviour
     bool isGrounded = false;
     Vector2 moveDir;
     Vector2 grapplePoint;
-    Vector2 grappleShootDir;
+    Vector2 prevGrapplePoint;
+    Vector2 grapplePointVelocity;
     float grappleDist = -1;
     GameObject hookpointGO;
     DistanceJoint2D ropeJoint;
@@ -91,7 +93,7 @@ public class PlayerController : MonoBehaviour
     public bool IsGrounded => isGrounded;
     public bool IsGrappling => state == PlayerState.Hooked || state == PlayerState.Shooting;
     public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }
-    public Vector2 GrappleShootDirection { get => grappleShootDir; set => grappleShootDir = value; }
+    public Vector2 GrapplePointVelocity { get => grapplePointVelocity; set => grapplePointVelocity = value; }
     public Vector2 GrappleDirection => (grapplePoint - (Vector2)transform.position).normalized;
     public Vector2 Velocity { get => rb.velocity; set => rb.velocity = value; }
 
@@ -171,7 +173,9 @@ public class PlayerController : MonoBehaviour
             line.SetPosition(0, grapplePoint);
             line.material = ropeMaterial;
             line.textureMode = LineTextureMode.Tile;
-            grappleIcon.transform.position = grapplePoint;
+
+            Vector3 interpolatedPosition = Vector3.Lerp(prevGrapplePoint, GrapplePosition, (float)(Time.timeAsDouble - Time.fixedTimeAsDouble) / Time.fixedDeltaTime);
+            grappleIcon.transform.position = interpolatedPosition;
 
             // while shooting releasing the mouse will always cancel the shoot!
             if (Input.GetMouseButtonUp(0))
@@ -232,6 +236,12 @@ public class PlayerController : MonoBehaviour
         drag += dragAdders.Values.Sum();
         rb.drag = Mathf.Max(drag, 0.0f);
         rb.AddForce(moveDir * (isGrounded ? groundSpeed : aidSpeed));
+
+        prevGrapplePoint = grapplePoint; // Set before update and always set
+        if (state == PlayerState.Shooting) // Is Shooting
+        {
+            IsShootingPhysicsLogic();
+        }
 
         if (state == PlayerState.Hooked) // Is Hooked
         {
@@ -359,7 +369,8 @@ public class PlayerController : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 // start shooting
-                grappleShootDir = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized * grappleSpeed;
+                grapplePointVelocity = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized * grappleSpeed;
+                grapplePointVelocity += rb.velocity; // Add our velocity to it
                 grapplePoint = this.transform.position;
                 state = PlayerState.Shooting;
                 shotTimer = 0f; 
@@ -382,20 +393,20 @@ public class PlayerController : MonoBehaviour
 
     void IsShootingLogic()
     {
-        shotTimer += Time.deltaTime;
+        // Handle Item
+        if (curItem != null)
+            curItem.ItemUpdate();
+    }
 
-        var prevPos = grapplePoint;
-        if (shotTimer > grappleGravityDelay)
-            grapplePoint.y -= grappleGravity * Time.deltaTime;
-        grapplePoint += grappleShootDir * Time.deltaTime;
-        grappleShootDir *= grappleDrag;
-        // Distance travelled in 1 second
-        var Vel = (grapplePoint - prevPos).magnitude / Time.deltaTime;
-        // distance traveled in 1 physics step
-        var dist = Vel * Time.fixedDeltaTime;
+    void IsShootingPhysicsLogic()
+    {
+        shotTimer += Time.fixedDeltaTime;
+        if (shotTimer >= grappleGravityDelay)
+            grapplePoint.y -= grappleGravity * Time.fixedDeltaTime;
+        grapplePoint += grapplePointVelocity * Time.fixedDeltaTime;
 
         // check if we hit something
-        var hit = Physics2D.Raycast(grapplePoint, grappleShootDir, dist, grappleLayer);
+        var hit = Physics2D.Raycast(grapplePoint, grapplePointVelocity.normalized, (grapplePointVelocity * Time.fixedDeltaTime).magnitude, grappleLayer);
         if (hit != default)
         {
             bool attach = true;
@@ -408,7 +419,7 @@ public class PlayerController : MonoBehaviour
                     activeInteractor.OnLeave(this);
                 activeInteractor = interactor;
 
-                if(state != PlayerState.Shooting)
+                if (state != PlayerState.Shooting)
                 {
                     // The Interactor has changed our state so we need to return
                     return;
@@ -416,7 +427,7 @@ public class PlayerController : MonoBehaviour
             }
 
             // if we hit something and we are allowed to attach
-            if(attach)
+            if (attach)
             {
                 state = PlayerState.Hooked;
 
@@ -436,9 +447,9 @@ public class PlayerController : MonoBehaviour
                 GrappleHitFeedback?.PlayFeedbacks();
             }
         }
-        // Handle Item
-        if (curItem != null)
-            curItem.ItemUpdate();
+
+        if (shotTimer >= grappleDragDelay)
+            grapplePointVelocity *= 1f - (grappleDrag * Time.fixedDeltaTime);
     }
 
     #endregion
