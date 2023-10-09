@@ -7,6 +7,7 @@ using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
@@ -74,6 +75,7 @@ public class PlayerController : MonoBehaviour
     float bestTimer = 0f;
     bool doTimer = false;
     string nextlvl = "";
+    BoxCollider2D col;
 
     [HideInInspector]
     public ItemObject curItem;
@@ -102,6 +104,16 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        col = GetComponent<BoxCollider2D>();
+
+        // Snap to ground take col size into account
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 100f, groundLayer);
+        if (hit)
+        {
+            transform.position = hit.point + new Vector2(0, col.size.y / 2);
+            //Debug.Break();
+        }
+
     }
 
     void Start()
@@ -372,6 +384,7 @@ public class PlayerController : MonoBehaviour
                 grapplePointVelocity = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized * grappleSpeed;
                 grapplePointVelocity += rb.velocity; // Add our velocity to it
                 grapplePoint = this.transform.position;
+                prevGrapplePoint = grapplePoint;
                 state = PlayerState.Shooting;
                 shotTimer = 0f; 
                 GrappleLaunchFeedback?.PlayFeedbacks();

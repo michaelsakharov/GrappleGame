@@ -63,6 +63,11 @@ public class PlayerVisuals : MonoBehaviour
         OnEnable();
     }
 
+    private void Awake()
+    {
+        OnEnable();
+    }
+
     void OnEnable()
     {
         clearColorCache = new Color32[res.x * res.y];
