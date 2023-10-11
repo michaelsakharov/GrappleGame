@@ -25,7 +25,7 @@ MonoBehaviour:
     Position: {x: 0, y: 0}
     BlendOverlap: 0
     Material: {fileID: 0}
-    GameObjectIdentifier: 82884
+    GameObjectIdentifier: 28684
   - tileset: {fileID: 11400000}
     Name: Dirt Dupe
     Type: 1
@@ -36,7 +36,7 @@ MonoBehaviour:
     Position: {x: 2, y: 0}
     BlendOverlap: 0
     Material: {fileID: 0}
-    GameObjectIdentifier: 82884
+    GameObjectIdentifier: 28684
   - tileset: {fileID: 11400000}
     Name: Dirt Dupe Dupe
     Type: 0
@@ -47,4 +47,4 @@ MonoBehaviour:
     Position: {x: 0, y: 0}
     BlendOverlap: 0
     Material: {fileID: 0}
-    GameObjectIdentifier: 82884
+    GameObjectIdentifier: 28684
