@@ -74,7 +74,6 @@ public class PlayerController : MonoBehaviour
     float levelTimer = 0f;
     float bestTimer = 0f;
     bool doTimer = false;
-    string nextlvl = "";
     BoxCollider2D col;
 
     [HideInInspector]
@@ -104,16 +103,16 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
         col = GetComponent<BoxCollider2D>();
 
+        // TODO: Cant snap to ground due to Tilemap possibly taking a frame or two or even three to load
         // Snap to ground take col size into account
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 100f, groundLayer);
-        if (hit)
-        {
-            transform.position = hit.point + new Vector2(0, col.size.y / 2);
-            //Debug.Break();
-        }
-
+        //RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 100f, groundLayer);
+        //if (hit)
+        //{
+        //    transform.position = hit.point + new Vector2(0, col.size.y / 2);
+        //}
     }
 
     void Start()
@@ -127,7 +126,8 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
 
         // load best timer
-        bestTimer = PlayerPrefs.GetFloat("BestTime_" + SceneManager.GetActiveScene().name, 0f);
+        if(GameManager.CurrentLevel != null)
+            bestTimer = PlayerPrefs.GetFloat("BestTime_" + GameManager.CurrentLevel.UniqueID, 0f);
 
         curItem = null;
     }
@@ -146,6 +146,17 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
             RestartLevel();
+
+        if (GameManager.CurrentLevel != null && GameManager.CurrentLevel.isTest)
+        {
+            // Noclip
+            if (Input.GetKeyDown(KeyCode.N))
+                col.enabled = !col.enabled;
+
+            // Back to Level Editor
+            if (Input.GetKeyDown(KeyCode.B))
+                GameManager.GoBackToLevelEditor();
+        }
 
         // check isGrounded
         isGrounded = CheckIsGrounded();
@@ -326,16 +337,6 @@ public class PlayerController : MonoBehaviour
         bestFinishLevelTimerText.text = bestTimeText;
     }
 
-    void RestartLevel()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
-    void LoadNextLevel()
-    {
-        SceneManager.LoadScene(nextlvl);
-    }
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
         var interactor = collision.gameObject.GetComponents<IPlayerInteractor>();
@@ -479,10 +480,14 @@ public class PlayerController : MonoBehaviour
         state = idle;
     }
 
+
+    void RestartLevel() => GameManager.RestartLevel();
+    void GM_FinishLevel() => GameManager.FinishLevel(levelTimer);
+
     public void Kill()
     {
         state = PlayerState.Dead;
-        Invoke(nameof(RestartLevel), 2f);
+        Invoke(nameof(RestartLevel), 1f);
 
         visual.SetActive(false);
         deathEffect.SetActive(true);
@@ -492,21 +497,12 @@ public class PlayerController : MonoBehaviour
         rb.velocity = Vector2.zero;
     }
 
-    public void FinishLevel(string nextLevel)
+    public void FinishLevel()
     {
-        nextlvl = nextLevel;
         state = PlayerState.Finished;
-        Invoke(nameof(LoadNextLevel), 2f);
+        Invoke(nameof(GM_FinishLevel), 3f);
 
         levelFinishUI.SetActive(true);
-
-        // update best timer
-        var bestTime = PlayerPrefs.GetFloat("BestTime_" + SceneManager.GetActiveScene().name, float.MaxValue);
-        if (bestTime > levelTimer)
-        {
-            PlayerPrefs.SetFloat("BestTime_" + SceneManager.GetActiveScene().name, levelTimer);
-            bestTime = levelTimer;
-        }
 
         // Stop all player motion
         rb.isKinematic = true;

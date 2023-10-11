@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d2e0b9737d37c340828d71146454391, type: 3}
+  m_Name: Background_Tileset 1
+  m_EditorClassIdentifier: 
+  Texture: {fileID: 2800000, guid: 55938c6d63f309b43bff1e4b5751569e, type: 3}
+  TileSize: {x: 8, y: 8}
+  Tiles:
+  - tileset: {fileID: 11400000}
+    Name: Dirt
+    Type: 1
+    HasCollider: 0
+    ColliderTemplate: {fileID: 0}
+    PhysicsMaterial: {fileID: 0}
+    VariationsCount: 1
+    Position: {x: 0, y: 0}
+    BlendOverlap: 0
+    Material: {fileID: 0}
+    GameObjectIdentifier: -1
+  - tileset: {fileID: 11400000}
+    Name: Dirt Dupe
+    Type: 1
+    HasCollider: 0
+    ColliderTemplate: {fileID: 0}
+    PhysicsMaterial: {fileID: 0}
+    VariationsCount: 1
+    Position: {x: 2, y: 0}
+    BlendOverlap: 0
+    Material: {fileID: 0}
+    GameObjectIdentifier: -1

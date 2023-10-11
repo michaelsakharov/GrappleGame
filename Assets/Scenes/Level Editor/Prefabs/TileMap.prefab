@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4839762696060966784
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4839762696060966798}
+  - component: {fileID: 4839762696060966799}
+  m_Layer: 0
+  m_Name: TileMap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4839762696060966798
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4839762696060966784}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4839762696060966799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4839762696060966784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb63837ebab4b149b05f0847e78f0d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Layers:
+  - Name: Background
+    Tileset: {fileID: 11400000, guid: 1b831bb918e285b44bff11bd2af113ad, type: 2}
+    SortingOrder: -1000
+    ZOrder: 10
+    ChunkTag: Untagged
+    ChunkLayerMask:
+      serializedVersion: 2
+      m_Bits: 1
+    ForceDisableColliders: 1
+    DefaultPhysicsMaterial: {fileID: 0}
+  - Name: Ground
+    Tileset: {fileID: 11400000, guid: 315f8be5991295b42bf415bf4acb0f78, type: 2}
+    SortingOrder: 0
+    ZOrder: 0
+    ChunkTag: Untagged
+    ChunkLayerMask:
+      serializedVersion: 2
+      m_Bits: 1
+    ForceDisableColliders: 0
+    DefaultPhysicsMaterial: {fileID: 0}
+  - Name: Foreground
+    Tileset: {fileID: 11400000, guid: a4927743588a85141a2bcc9a48a5f8b7, type: 2}
+    SortingOrder: 1000
+    ZOrder: -10
+    ChunkTag: Untagged
+    ChunkLayerMask:
+      serializedVersion: 2
+      m_Bits: 1
+    ForceDisableColliders: 1
+    DefaultPhysicsMaterial: {fileID: 0}
+  ShowChunksInHierarchy: 1
+  ChunkTileCount: 32
+  TileSize: 0.5
+  ZOffset: 1

@@ -12,15 +12,15 @@ public class FollowPlayer : MonoBehaviour
     public float zoomMagnitude = 1f;
     public float zoomIncreaseSpeed = 1f;
     public float zoomDecreaseSpeed = 1f;
-    PlayerController player;
     Camera cam;
+
+    PlayerController player => PlayerController.Instance;
 
     // Start is called before the first frame update
     void Start()
     {
         cam = GetComponent<Camera>();
         cam.orthographicSize = startZoom;
-        player = GameObject.Find("Player").GetComponent<PlayerController>();
         if (followX && followY)
             transform.position = new Vector3(player.transform.position.x, player.transform.position.y, -10);
         else if (followX)
