@@ -134,18 +134,21 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        float hor = Input.GetAxis("Horizontal");
-        float ver = Input.GetAxis("Vertical");
-        moveDir = new Vector2(hor, ver).normalized;
+        moveDir = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+
+        // Snap Movement once past Threshold
+        const float Threshold = 0.1f;
+        moveDir.x = Mathf.Abs(moveDir.x) < Threshold ? 0 : Mathf.Sign(moveDir.x);
+        moveDir.y = Mathf.Abs(moveDir.y) < Threshold ? 0 : Mathf.Sign(moveDir.y);
+
 
         if (state != PlayerState.Finished && doTimer)
             levelTimer += Time.deltaTime;
-        else if (hor != 0 || ver != 0 || state != PlayerState.Idle) doTimer = true;
+        else if (moveDir.x != 0 || moveDir.y != 0 || state != PlayerState.Idle) doTimer = true;
 
         UpdateLevelTimers();
 
-        if (Input.GetKeyDown(KeyCode.R))
-            RestartLevel();
+        if (Input.GetKeyDown(KeyCode.R)) RestartLevel();
 
         if (GameManager.CurrentLevel != null && GameManager.CurrentLevel.isTest)
         {
@@ -415,12 +418,15 @@ public class PlayerController : MonoBehaviour
     void IsShootingPhysicsLogic()
     {
         shotTimer += Time.fixedDeltaTime;
+        var before = grapplePoint;
         if (shotTimer >= grappleGravityDelay)
             grapplePoint.y -= grappleGravity * Time.fixedDeltaTime;
         grapplePoint += grapplePointVelocity * Time.fixedDeltaTime;
 
         // check if we hit something
-        var hit = Physics2D.Raycast(grapplePoint, grapplePointVelocity.normalized, (grapplePointVelocity * Time.fixedDeltaTime).magnitude, grappleLayer);
+        //var hit = Physics2D.Raycast(grapplePoint, grapplePointVelocity.normalized, (grapplePointVelocity * Time.fixedDeltaTime).magnitude, grappleLayer);
+        // Raycast from Before to GrapplePoint
+        var hit = Physics2D.Raycast(before, grapplePoint - before, (grapplePoint - before).magnitude, grappleLayer);
         if (hit != default)
         {
             bool attach = true;
