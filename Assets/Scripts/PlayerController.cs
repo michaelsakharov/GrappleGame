@@ -401,15 +401,6 @@ public class PlayerController : MonoBehaviour
     {
         // update grapple dist to be minimum
         grappleDist = Mathf.Min(grappleDist, Vector2.Distance(transform.position, grapplePoint));
-
-        if(grappleDist < 1.5f && Vector2.Dot(grappleHitNormal, Velocity) < 0)
-        {
-            // we are close to the grapple point and towards it
-            // so we should detach
-            state = PlayerState.Idle;
-            line.enabled = false;
-        }
-
         // Handle Item
         if (curItem != null)
             curItem.ItemUpdate();
