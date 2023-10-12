@@ -105,14 +105,6 @@ public class PlayerController : MonoBehaviour
         Instance = this;
 
         col = GetComponent<BoxCollider2D>();
-
-        // TODO: Cant snap to ground due to Tilemap possibly taking a frame or two or even three to load
-        // Snap to ground take col size into account
-        //RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 100f, groundLayer);
-        //if (hit)
-        //{
-        //    transform.position = hit.point + new Vector2(0, col.size.y / 2);
-        //}
     }
 
     void Start()
@@ -130,6 +122,14 @@ public class PlayerController : MonoBehaviour
             bestTimer = PlayerPrefs.GetFloat("BestTime_" + GameManager.CurrentLevel.UniqueID, 0f);
 
         curItem = null;
+
+        // TODO: Ensure Tilemap has finished loading before doing this
+        // Snap to ground take col size into account
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 2f, groundLayer);
+        if (hit)
+        {
+            transform.position = hit.point + new Vector2(0, col.size.y / 2);
+        }
     }
 
     void Update()
