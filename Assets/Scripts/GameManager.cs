@@ -6,22 +6,28 @@ using UnityEngine.SceneManagement;
 
 public static class GameManager
 {
-    public static SerializedLevel CurrentLevel { get; private set; }
-
-    public readonly static string[] Campaigns = new string[] { "Game" };
-    static readonly Dictionary<string, List<SerializedLevel>> CampaignLevels = new(StringComparer.OrdinalIgnoreCase);
-
     public const string menuScene = "Menu";
     public const string levelScene = "Level";
     public const string levelEditorScene = "LevelEditor";
 
+
+    public readonly static string[] Campaigns = new string[] { "Game" };
+    static readonly Dictionary<string, List<SerializedLevel>> CampaignLevels = new(StringComparer.OrdinalIgnoreCase);
+
+    public static SerializedLevel CurrentLevel { get; private set; }
+    public static float levelTimer { get; private set; }
+    public static float bestTimer { get; private set; }
+
+    public static bool IsInCampaign => isCampaign;
+    public static bool PlayerFinished => PlayerController.Instance.State == PlayerController.PlayerState.Finished;
+    public static bool PlayerDead => PlayerController.Instance.State == PlayerController.PlayerState.Dead;
+    public static string CurrentCampaign => curCampaign.Item1;
+    public static int CurrentCampaignLevel => curCampaign.Item2;
+
     static bool isCampaign = false;
     static (string, int) curCampaign;
     static bool isInitialized = false;
-
-    public static bool IsInCampaign => isCampaign;
-    public static string CurrentCampaign => curCampaign.Item1;
-    public static int CurrentCampaignLevel => curCampaign.Item2;
+    static bool doTimer = false;
 
     public static void Initialize()
     {
@@ -61,6 +67,51 @@ public static class GameManager
         if (SceneManager.GetActiveScene().name != menuScene)
             SceneManager.LoadScene(menuScene);
     }
+
+    /// <summary> Called when the player initializes </summary>
+    public static void PlayerStart()
+    {
+        bestTimer = GetBestTime();
+        doTimer = false;
+    }
+
+    public static void PlayerUpdate()
+    {
+        if (CurrentLevel != null)
+        {
+            if (Input.GetKeyDown(KeyCode.R)) RestartLevel();
+
+            if (PlayerController.Instance.State != PlayerController.PlayerState.Finished && doTimer)
+                levelTimer += Time.deltaTime;
+
+            if (GameHud.Instance != null)
+                GameHud.Instance.UpdateLevelTimers(levelTimer, bestTimer);
+
+
+            // Level Editor - Play Testing
+            if (CurrentLevel.isPlayTesting)
+            {
+                // Noclip
+                if (Input.GetKeyDown(KeyCode.N))
+                    PlayerController.Instance.ToggleCollider();
+
+                // Back to Level Editor
+                if (Input.GetKeyDown(KeyCode.B))
+                    GameManager.GoBackToLevelEditor();
+            }
+        }
+    }
+
+    public static void PlayerLateUpdate()
+    {
+
+    }
+
+
+    #region Public Methods
+
+    public static void StartTimer() => doTimer = true;
+    public static void StopTimer() => doTimer = false;
 
     public static void PlayLevel(SerializedLevel level)
     {
@@ -113,7 +164,6 @@ public static class GameManager
 
     public static void GoBackToLevelEditor()
     {
-        if (CurrentLevel.isTest == false) throw new InvalidOperationException("Not in test mode!");
         if (CurrentLevel.isPlayTesting == false) throw new InvalidOperationException("Not in test mode!");
         SceneManager.LoadScene(levelEditorScene);
     }
@@ -154,11 +204,11 @@ public static class GameManager
         SceneManager.LoadScene(menuScene);
     }
 
-    public static void FinishLevel(float time)
+    public static void FinishLevel()
     {
         if (isCampaign)
         {
-            HandleBestTime("Campaign", time);
+            HandleBestTime("Campaign", levelTimer);
             if (!PlayNextCampaign())
             {
                 // Go to menu, We finished the Campaign
@@ -167,13 +217,14 @@ public static class GameManager
         }
         else
         {
-            HandleBestTime("CustomLevel", time);
+            HandleBestTime("CustomLevel", levelTimer);
             RestartLevel();
         }
     }
 
     public static float GetBestTime()
     {
+        if (CurrentLevel == null) return 0;
         if (isCampaign)
             return PlayerPrefs.GetFloat("Campaign_" + CurrentLevel.Name + "_" + CurrentLevel.UniqueID, 0);
         return PlayerPrefs.GetFloat("CustomLevel_" + CurrentLevel.UniqueID, 0);
@@ -181,7 +232,6 @@ public static class GameManager
 
     static void HandleBestTime(string key, float currentTime)
     {
-        if (CurrentLevel.isTest) return; // Don't save test times
         if (CurrentLevel.isPlayTesting) return; // Don't save test times
         string fullKey = key + "_" + CurrentLevel.Name + "_" + CurrentLevel.UniqueID;
         float bestTime = PlayerPrefs.GetFloat(fullKey, float.MaxValue);
@@ -202,4 +252,6 @@ public static class GameManager
     {
         Application.Quit();
     }
+
+    #endregion
 }

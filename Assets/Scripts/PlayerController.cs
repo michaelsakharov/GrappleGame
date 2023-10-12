@@ -1,27 +1,18 @@
 using MoreMountains.Feedbacks;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-
     public static PlayerController Instance { get; private set; }
 
     [Header("Visual")]
     public GameObject visual;
     public GameObject deathEffect;
-    public TMPro.TMP_Text levelTimerText;
-    public TMPro.TMP_Text bestLevelTimerText;
-    public GameObject levelFinishUI;
-    public TMPro.TMP_Text finishLevelTimerText;
-    public TMPro.TMP_Text bestFinishLevelTimerText;
 
     [Header("Items")]
     public LayerMask itemLayer;
@@ -72,9 +63,6 @@ public class PlayerController : MonoBehaviour
     float noIsGroundedTimer = 0f;
     float shotTimer = 0f;
 
-    float levelTimer = 0f;
-    float bestTimer = 0f;
-    bool doTimer = false;
     BoxCollider2D col;
 
     [HideInInspector]
@@ -87,11 +75,11 @@ public class PlayerController : MonoBehaviour
     public Dictionary<object, float> dragAdders = new Dictionary<object, float>();
     public Stack<bool> canGrapple = new Stack<bool>();
 
-
     public Rigidbody2D Rigidbody => rb;
     public bool IsHoldingItem => curItem != null;
     public Vector2 ItemDirection => curItem.AimDirection;
     public ItemObject HeldItem => curItem;
+    public PlayerState State => state;
     public bool IsGrounded => isGrounded;
     public bool IsGrappling => state == PlayerState.Hooked || state == PlayerState.Shooting;
     public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }
@@ -118,12 +106,7 @@ public class PlayerController : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
 
-        // load best timer
-        if(GameManager.CurrentLevel != null)
-            bestTimer = GameManager.GetBestTime();
-
         curItem = null;
-
         // TODO: Ensure Tilemap has finished loading before doing this
         // Snap to ground take col size into account
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 2f, groundLayer);
@@ -142,25 +125,6 @@ public class PlayerController : MonoBehaviour
         moveDir.x = Mathf.Abs(moveDir.x) < Threshold ? 0 : Mathf.Sign(moveDir.x);
         moveDir.y = Mathf.Abs(moveDir.y) < Threshold ? 0 : Mathf.Sign(moveDir.y);
 
-
-        if (state != PlayerState.Finished && doTimer)
-            levelTimer += Time.deltaTime;
-        else if (moveDir.x != 0 || moveDir.y != 0 || state != PlayerState.Idle) doTimer = true;
-
-        UpdateLevelTimers();
-
-        if (Input.GetKeyDown(KeyCode.R)) RestartLevel();
-
-        if (GameManager.CurrentLevel != null && GameManager.CurrentLevel.isTest)
-        {
-            // Noclip
-            if (Input.GetKeyDown(KeyCode.N))
-                col.enabled = !col.enabled;
-
-            // Back to Level Editor
-            if (Input.GetKeyDown(KeyCode.B))
-                GameManager.GoBackToLevelEditor();
-        }
 
         // check isGrounded
         isGrounded = CheckIsGrounded();
@@ -307,35 +271,6 @@ public class PlayerController : MonoBehaviour
             noIsGroundedTimer -= Time.deltaTime;
         }
         return false;
-    }
-
-    void UpdateLevelTimers()
-    {
-        TimeSpan timeSpan = TimeSpan.FromSeconds(levelTimer);
-        string levelTimerTextString = timeSpan.Hours > 0 ?
-            timeSpan.ToString(@"hh\:mm\:ss\:fff") :
-            timeSpan.ToString(@"mm\:ss\:fff");
-
-        TimeSpan bestTimeSpan = TimeSpan.FromSeconds(bestTimer);
-        string bestLevelTimerTextString = bestTimeSpan.Hours > 0 ?
-            bestTimeSpan.ToString(@"hh\:mm\:ss\:fff") :
-            bestTimeSpan.ToString(@"mm\:ss\:fff");
-
-        levelTimerText.text = levelTimerTextString;
-        bestLevelTimerText.text = bestLevelTimerTextString;
-
-        timeSpan = TimeSpan.FromSeconds(levelTimer);
-        string levelTimeText = timeSpan.TotalHours >= 1 ?
-            "Time: " + timeSpan.ToString(@"hh\:mm\:ss\:fff") :
-            "Time: " + timeSpan.ToString(@"mm\:ss\:fff");
-
-        bestTimeSpan = TimeSpan.FromSeconds(bestTimer);
-        string bestTimeText = bestTimeSpan.TotalHours >= 1 ?
-            "Best: " + bestTimeSpan.ToString(@"hh\:mm\:ss\:fff") :
-            "Best: " + bestTimeSpan.ToString(@"mm\:ss\:fff");
-
-        finishLevelTimerText.text = levelTimeText;
-        bestFinishLevelTimerText.text = bestTimeText;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -498,6 +433,8 @@ public class PlayerController : MonoBehaviour
 
     public void Kill()
     {
+        GameManager.StopTimer();
+
         state = PlayerState.Dead;
         Invoke(nameof(RestartLevel), 1f);
 
@@ -511,15 +448,19 @@ public class PlayerController : MonoBehaviour
 
     public void FinishLevel()
     {
+        GameManager.StopTimer();
+
         state = PlayerState.Finished;
         Invoke(nameof(GM_FinishLevel), 3f);
 
-        levelFinishUI.SetActive(true);
+        GameHud.Instance.levelFinishUI.SetActive(true);
 
         // Stop all player motion
         rb.isKinematic = true;
         rb.velocity = Vector2.zero;
     }
+
+    public void ToggleCollider() => col.enabled = !col.enabled;
 
     #endregion
 
