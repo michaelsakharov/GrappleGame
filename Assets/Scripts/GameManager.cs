@@ -174,15 +174,16 @@ public static class GameManager
     public static float GetBestTime()
     {
         if (isCampaign)
-            return PlayerPrefs.GetFloat("Campaign_" + CurrentLevel.Name + "_" + CurrentLevel.UniqueID, float.MaxValue);
-        return PlayerPrefs.GetFloat("CustomLevel_" + CurrentLevel.UniqueID, float.MaxValue);
+            return PlayerPrefs.GetFloat("Campaign_" + CurrentLevel.Name + "_" + CurrentLevel.UniqueID, 0);
+        return PlayerPrefs.GetFloat("CustomLevel_" + CurrentLevel.UniqueID, 0);
     }
 
     static void HandleBestTime(string key, float currentTime)
     {
         if (CurrentLevel.isTest) return; // Don't save test times
         string fullKey = key + "_" + CurrentLevel.Name + "_" + CurrentLevel.UniqueID;
-        if (currentTime < GetBestTime())
+        float bestTime = PlayerPrefs.GetFloat(fullKey, float.MaxValue);
+        if (currentTime < bestTime)
             PlayerPrefs.SetFloat(fullKey, currentTime);
     }
 
