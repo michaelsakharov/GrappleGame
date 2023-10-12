@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
     Vector2 grapplePoint;
     Vector2 prevGrapplePoint;
     Vector2 grapplePointVelocity;
+    Vector2 grappleHitNormal;
     float grappleDist = -1;
     GameObject hookpointGO;
     DistanceJoint2D ropeJoint;
@@ -205,10 +206,7 @@ public class PlayerController : MonoBehaviour
 
             // while shooting releasing the mouse will always cancel the shoot!
             if (Input.GetMouseButtonUp(0))
-            {
-                state = PlayerState.Idle;
-                line.enabled = false;
-            }
+                DetachGrapple();
         }
         else
         {
@@ -461,6 +459,7 @@ public class PlayerController : MonoBehaviour
                 state = PlayerState.Hooked;
 
                 grapplePoint = hit.point;
+                grappleHitNormal = hit.normal;
 
                 grappleDist = Vector2.Distance(transform.position, grapplePoint);
                 hookpointGO = new GameObject("HookPoint");
@@ -493,6 +492,13 @@ public class PlayerController : MonoBehaviour
     public void SetState(PlayerState idle)
     {
         state = idle;
+    }
+
+    internal void DetachGrapple()
+    {
+        if (!IsGrappling) return;
+        state = PlayerState.Idle;
+        line.enabled = false;
     }
 
 
@@ -539,5 +545,4 @@ public class PlayerController : MonoBehaviour
             Gizmos.DrawRay(rayOrigin, Vector2.down * groundedRayLength);
         }
     }
-
 }
