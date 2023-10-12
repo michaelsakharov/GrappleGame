@@ -65,7 +65,7 @@ public static class GameManager
 
         // if not already on menu Scene go to it
         if (SceneManager.GetActiveScene().name != menuScene)
-            SceneManager.LoadScene(menuScene);
+            BackToMenu();
     }
 
     /// <summary> Called when the player initializes </summary>
@@ -202,6 +202,7 @@ public static class GameManager
 
     public static void BackToMenu()
     {
+        GameManager.CurrentLevel = null;
         SceneManager.LoadScene(menuScene);
     }
 
