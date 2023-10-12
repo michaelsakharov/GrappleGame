@@ -628,14 +628,17 @@ public static class TileState
                     clickDragStart = LevelEditor.Instance.Tilemap.WorldToTile(mousePos);
                     isDragging = true;
                 }
-                else if (isDragging && (clickDragStart != tile) && Input.GetMouseButtonUp(0))
+                else if (isDragging && Input.GetMouseButtonUp(0))
                 {
                     isDragging = false;
 
-                    // For every tile from the start to the end, set the tile
-                    for (int x = Math.Min(clickDragStart.x, tile.x); x <= Math.Max(clickDragStart.x, tile.x); x++)
-                        for (int y = Math.Min(clickDragStart.y, tile.y); y <= Math.Max(clickDragStart.y, tile.y); y++)
-                            LevelEditor.Instance.Tilemap.SetTile(new Vector2Int(x, y), currentTile, currentLayer, true);
+                    if ((clickDragStart != tile))
+                    {
+                        // For every tile from the start to the end, set the tile
+                        for (int x = Math.Min(clickDragStart.x, tile.x); x <= Math.Max(clickDragStart.x, tile.x); x++)
+                            for (int y = Math.Min(clickDragStart.y, tile.y); y <= Math.Max(clickDragStart.y, tile.y); y++)
+                                LevelEditor.Instance.Tilemap.SetTile(new Vector2Int(x, y), currentTile, currentLayer, true);
+                    }
                 }
                 else if (isDragging)
                 {
