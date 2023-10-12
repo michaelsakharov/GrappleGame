@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class Tilemap : MonoBehaviour
 {
@@ -51,20 +52,39 @@ public class Tilemap : MonoBehaviour
 
     public Vector2Int WorldToTile(Vector2 worldPosition) => new(Mathf.FloorToInt(worldPosition.x / TileSize), Mathf.FloorToInt(worldPosition.y / TileSize));
     public Vector2 TileToWorld(Vector2Int tilePosition) => (Vector2)tilePosition * TileSize;
-    //public Vector2Int TileToChunk(Vector2Int tilePosition) => new(Mathf.FloorToInt(tilePosition.x / ChunkTileCount), Mathf.FloorToInt(tilePosition.y / ChunkTileCount));
+
     public Vector2Int TileToChunk(Vector2Int tilePosition)
     {
-        // Calculate the chunk coordinates by dividing the tile position by ChunkTileCount.
-        // Ensure to use integer division to get the floored result.
-        int chunkX = Mathf.FloorToInt(tilePosition.x / ChunkTileCount - ((tilePosition.x < 0) ? 1 : 0));
-        int chunkY = Mathf.FloorToInt(tilePosition.y / ChunkTileCount - ((tilePosition.y < 0) ? 1 : 0));
+        int x = Mathf.FloorToInt(tilePosition.x);
+        int y = Mathf.FloorToInt(tilePosition.y);
+        int chunkX, chunkY;
+
+        if (x >= 0) chunkX = x / ChunkTileCount;
+        else        chunkX = (x + 1) / ChunkTileCount - 1;
+
+        if (y >= 0) chunkY = y / ChunkTileCount;
+        else        chunkY = (y + 1) / ChunkTileCount - 1;
 
         return new Vector2Int(chunkX, chunkY);
     }
-    public Vector2Int TileRelativeToChunk(Vector2Int tilePosition, Chunk chunk)
-        => new((tilePosition.x - chunk.Coord.x * ChunkTileCount) % ChunkTileCount,
-               (tilePosition.y - chunk.Coord.y * ChunkTileCount) % ChunkTileCount
-            );
+
+    public Vector2Int TileRelativeToChunk(Vector2Int tilePosition)
+    {
+        int localX;
+        int localY;
+
+        if (tilePosition.x >= 0)
+            localX = tilePosition.x % ChunkTileCount;
+        else
+            localX = ChunkTileCount - 1 - (-tilePosition.x - 1) % ChunkTileCount;
+
+        if (tilePosition.y >= 0)
+            localY = tilePosition.y % ChunkTileCount;
+        else
+            localY = ChunkTileCount - 1 - (-tilePosition.y - 1) % ChunkTileCount;
+
+        return new Vector2Int(localX, localY);
+    }
 
     public Vector2Int WorldToChunk(Vector2 worldPosition) => new(Mathf.FloorToInt(worldPosition.x / (TileSize * ChunkTileCount)), Mathf.FloorToInt(worldPosition.y / (TileSize * ChunkTileCount)));
     public Vector2 ChunkToWorld(Vector2Int chunkPosition) => (Vector2)chunkPosition * TileSize * ChunkTileCount;
@@ -79,7 +99,7 @@ public class Tilemap : MonoBehaviour
     {
 
         Chunk chunk = CreateChunkFromTile(worldTile, layer);
-        Vector2Int relativeTile = TileRelativeToChunk(worldTile, chunk);
+        Vector2Int relativeTile = TileRelativeToChunk(worldTile);
 
         if (chunk.data.GetTile(relativeTile) == tileID)
             return;
@@ -106,14 +126,14 @@ public class Tilemap : MonoBehaviour
     {
         Chunk chunk = GetChunkFromTile(worldTile, layer);
         if (chunk == null) return 0; // Chunk not loaded
-        Vector2Int relativeTile = TileRelativeToChunk(worldTile, chunk);
+        Vector2Int relativeTile = TileRelativeToChunk(worldTile);
         return chunk.data.GetTile(relativeTile);
     }
 
     public void SetColor(Vector2Int worldTile, Color32 color, int layer)
     {
         Chunk chunk = CreateChunkFromTile(worldTile, layer);
-        Vector2Int relativeTile = TileRelativeToChunk(worldTile, chunk);
+        Vector2Int relativeTile = TileRelativeToChunk(worldTile);
         chunk.data.SetColor(relativeTile, color);
         chunk.RequestUpdate();
     }
@@ -122,7 +142,7 @@ public class Tilemap : MonoBehaviour
     {
         Chunk chunk = GetChunkFromTile(worldTile, layer);
         if (chunk == null) return Color.white; // Chunk not loaded
-        Vector2Int relativeTile = TileRelativeToChunk(worldTile, chunk);
+        Vector2Int relativeTile = TileRelativeToChunk(worldTile);
         return chunk.data.GetColor(relativeTile);
     }
 
@@ -186,7 +206,7 @@ public class Tilemap : MonoBehaviour
         var newBitmask = CalculateBitmask(worldTile, layer);
         Chunk chunk = GetChunkFromTile(worldTile, layer);
         if (chunk == null) return; // Chunk not loaded
-        chunk.data.SetBitmask(TileRelativeToChunk(worldTile, chunk), newBitmask);
+        chunk.data.SetBitmask(TileRelativeToChunk(worldTile), newBitmask);
         if (updateNeighbors)
         {
             // Update neighbors as well
