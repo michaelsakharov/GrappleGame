@@ -378,10 +378,11 @@ public static class SelectState
             if (Input.GetKeyDown(KeyCode.Delete))
             {
                 Undo.RegisterState(new UndoSelection(), "Selection Changed");
+                var gos = selectedObjects.Select((x) => { return x.gameObject; });
                 selectedObjects.Clear();
                 selectedPositions.Clear();
+                Undo.RegisterState(new UndoDelete(gos), "Deleted Props");
 
-                Undo.RegisterState(new UndoDelete(selectedObjects.Select((x) => { return x.gameObject; })), "Deleted Props");
             }
 
             // Duplicate
