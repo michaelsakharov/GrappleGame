@@ -6000,6 +6000,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Condition: 0
   invert: 1
+  showIfFailed: 1
+  Campaign: Game
+  Level: 0
 --- !u!1 &4708369984483263453
 GameObject:
   m_ObjectHideFlags: 0
@@ -6012,6 +6015,7 @@ GameObject:
   - component: {fileID: 7574911774195264181}
   - component: {fileID: 2019169270841738754}
   - component: {fileID: 7715943112425379380}
+  - component: {fileID: 861498075}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -6104,6 +6108,24 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &861498075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4708369984483263453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 026ffe4515e5828438c9c2f18fc65e72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 8142213471756539357}
+  levelTimerText: {fileID: 2406499069925801939}
+  bestLevelTimerText: {fileID: 1150035541561701794}
+  levelFinishUI: {fileID: 2866708351895496414}
+  finishLevelTimerText: {fileID: 5924919479550021536}
+  bestFinishLevelTimerText: {fileID: 6651477796341633898}
 --- !u!1 &4711307371441569658
 GameObject:
   m_ObjectHideFlags: 0
@@ -6859,6 +6881,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Condition: 0
   invert: 0
+  showIfFailed: 0
+  Campaign: Game
+  Level: 0
 --- !u!1 &5754603753061940576
 GameObject:
   m_ObjectHideFlags: 0
@@ -7169,6 +7194,8 @@ GameObject:
   - component: {fileID: 8142213471756539346}
   - component: {fileID: 8142213471756539358}
   - component: {fileID: 8142213471756539357}
+  - component: {fileID: 1768925588}
+  - component: {fileID: 1768925589}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -7260,15 +7287,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visual: {fileID: 8142213471971868136}
   deathEffect: {fileID: 1193629882}
-  levelTimerText: {fileID: 2406499069925801939}
-  bestLevelTimerText: {fileID: 1150035541561701794}
-  levelFinishUI: {fileID: 2866708351895496414}
-  finishLevelTimerText: {fileID: 5924919479550021536}
-  bestFinishLevelTimerText: {fileID: 6651477796341633898}
-  itemLayer:
-    serializedVersion: 2
-    m_Bits: 1024
-  itemPickupRange: 1
   grappleLayer:
     serializedVersion: 2
     m_Bits: 320
@@ -7295,6 +7313,34 @@ MonoBehaviour:
   aidSpeed: 5
   airDrag: 0
   LandFeedback: {fileID: 5506779872055402926}
+--- !u!114 &1768925588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8142213471756539356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ccef5769481267478124e48496b3b19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1768925589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8142213471756539356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bcedfcd31f311c458d4abe297a57bdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  itemPickupRange: 1
   curItem: {fileID: 0}
 --- !u!1 &8142213471971868136
 GameObject:
