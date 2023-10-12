@@ -155,7 +155,7 @@ public class PlayerVisuals : MonoBehaviour
             rF = rightFoot;
             lH = leftHand;
             rH = rightHand;
-            if (Inventory.IsHoldingItem)
+            if (Inventory.Instance != null && Inventory.IsHoldingItem)
                 HoldItem();
             lEMiddle = leftEarMiddle;
             rEMiddle = rightEarMiddle;
@@ -184,7 +184,7 @@ public class PlayerVisuals : MonoBehaviour
 
     void doBounce()
     {
-        if (!Inventory.IsHoldingItem)
+        if (Inventory.Instance == null || !Inventory.IsHoldingItem)
             ApplySpringPhysics(ref rH, rightHand, limbSpringStrength);
         else
             HoldItem();
