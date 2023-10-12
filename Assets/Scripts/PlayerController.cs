@@ -14,20 +14,6 @@ public class PlayerController : MonoBehaviour
     public GameObject visual;
     public GameObject deathEffect;
 
-    [Header("Grapple")]
-    public LayerMask grappleLayer;
-    public Transform grappleIcon;
-    public float grappleSpeed = 5f;
-    public float grappleGravity = 2f;
-    public float grappleGravityDelay = 0.25f;
-    public float grappleDrag = 0.95f;
-    public float grappleDragDelay = 0.25f;
-    public float grappleForce = 5f;
-    public MMF_Player GrappleLaunchFeedback;
-    public MMF_Player GrappleHitFeedback;
-    public Material ropeMaterial;
-
-
     [Header("Movement")]
     [Header("Grounded")]
     public LayerMask groundLayer;
@@ -35,7 +21,6 @@ public class PlayerController : MonoBehaviour
     public float groundedRayLength = 0.1f;
     public float playerWidth = 0.5f;
     public float groundedRayHeightOffset = -0.39f;
-    public bool canBeGroundedWhileHooked = false;
     public float groundSpeed = 5f;
     public float groundDrag = 0.99f;
     [Header("Air")]
@@ -46,35 +31,20 @@ public class PlayerController : MonoBehaviour
 
     bool isGrounded = false;
     Vector2 moveDir;
-    Vector2 grapplePoint;
-    Vector2 prevGrapplePoint;
-    Vector2 grapplePointVelocity;
-    Vector2 grappleHitNormal;
-    float grappleDist = -1;
-    GameObject hookpointGO;
-    DistanceJoint2D ropeJoint;
-    internal LineRenderer line;
     Rigidbody2D rb;
-    IGrappleInteractor activeInteractor;
     float noIsGroundedTimer = 0f;
-    float shotTimer = 0f;
 
     BoxCollider2D col;
 
-    public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished }
+    public enum PlayerState { Idle, Dead, Finished }
     PlayerState state = PlayerState.Idle;
 
     public Dictionary<object, float> gravityScalers = new Dictionary<object, float>();
     public Dictionary<object, float> dragAdders = new Dictionary<object, float>();
-    public Stack<bool> canGrapple = new Stack<bool>();
 
     public Rigidbody2D Rigidbody => rb;
     public PlayerState State => state;
     public bool IsGrounded => isGrounded;
-    public bool IsGrappling => state == PlayerState.Hooked || state == PlayerState.Shooting;
-    public Vector2 GrapplePosition { get => grapplePoint; set => grapplePoint = value; }
-    public Vector2 GrapplePointVelocity { get => grapplePointVelocity; set => grapplePointVelocity = value; }
-    public Vector2 GrappleDirection => (grapplePoint - (Vector2)transform.position).normalized;
     public Vector2 Velocity { get => rb.velocity; set => rb.velocity = value; }
 
     public event Action<Vector2> OnImpact;
@@ -88,12 +58,6 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        GameObject linGO = new GameObject("Line");
-        line = linGO.AddComponent<LineRenderer>();
-        line.startWidth = 0.05f;
-        line.endWidth = 0.05f;
-        line.enabled = false;
-
         rb = GetComponent<Rigidbody2D>();
 
         // TODO: Ensure Tilemap has finished loading before doing this
@@ -114,7 +78,7 @@ public class PlayerController : MonoBehaviour
         moveDir.x = Mathf.Abs(moveDir.x) < Threshold ? 0 : Mathf.Sign(moveDir.x);
         moveDir.y = Mathf.Abs(moveDir.y) < Threshold ? 0 : Mathf.Sign(moveDir.y);
 
-        if (moveDir.x != 0 || moveDir.y != 0 || state == PlayerState.Shooting || state == PlayerState.Hooked)
+        if (moveDir.x != 0 || moveDir.y != 0)
             GameManager.StartTimer();
 
         // check isGrounded
@@ -124,14 +88,6 @@ public class PlayerController : MonoBehaviour
         {
             IsIdleLogic();
         }
-        else if (state == PlayerState.Shooting) // Is Shooting
-        {
-            IsShootingLogic();
-        }
-        else if (state == PlayerState.Hooked) // Is Hooked
-        {
-            IsHookedLogic();
-        }
         else if(state == PlayerState.Dead)
         {
             moveDir = Vector2.zero; // stop moving were ded :(
@@ -139,44 +95,6 @@ public class PlayerController : MonoBehaviour
         else if(state == PlayerState.Finished)
         {
             moveDir = Vector2.zero;
-        }
-
-        if (state == PlayerState.Shooting || state == PlayerState.Hooked)
-        {
-            // if cant grapple
-            if (canGrapple.Count > 0 && !canGrapple.Peek())
-            {
-                state = PlayerState.Idle;
-                line.enabled = false;
-            }
-
-            line.enabled = true;
-            line.SetPosition(1, transform.position);
-            line.SetPosition(0, grapplePoint);
-            line.material = ropeMaterial;
-            line.textureMode = LineTextureMode.Tile;
-
-            Vector3 interpolatedPosition = Vector3.Lerp(prevGrapplePoint, GrapplePosition, (float)(Time.timeAsDouble - Time.fixedTimeAsDouble) / Time.fixedDeltaTime);
-            grappleIcon.transform.position = interpolatedPosition;
-
-            // while shooting releasing the mouse will always cancel the shoot!
-            if (Input.GetMouseButtonUp(0))
-                DetachGrapple();
-        }
-        else
-        {
-            // Were not shooting or hooked so we can reset the entire state to idle
-            line.enabled = false;
-            grappleIcon.transform.position = new Vector3(9999f, 9999f, 0f);
-
-            // make sure anything we created is destroyed
-            if (ropeJoint != null) Destroy(ropeJoint);
-            if (hookpointGO != null) Destroy(hookpointGO);
-
-            // if we has an grapple interactor we need to notify the interactor that we have left
-            if (activeInteractor != null)
-                activeInteractor.OnLeave(this);
-            activeInteractor = null;
         }
 
         float gravityScale = 1f;
@@ -191,30 +109,10 @@ public class PlayerController : MonoBehaviour
         drag += dragAdders.Values.Sum();
         rb.drag = Mathf.Max(drag, 0.0f);
         rb.AddForce(moveDir * (isGrounded ? groundSpeed : aidSpeed));
-
-        prevGrapplePoint = grapplePoint; // Set before update and always set
-        if (state == PlayerState.Shooting) // Is Shooting
-        {
-            IsShootingPhysicsLogic();
-        }
-
-        if (state == PlayerState.Hooked) // Is Hooked
-        {
-            // Grapple force
-            rb.AddForce((grapplePoint - (Vector2)transform.position).normalized * grappleForce);
-            // apply a Rope force to stop the player exceeding rope length
-            ropeJoint.distance = grappleDist;
-        }
     }
 
     bool CheckIsGrounded()
     {
-        if (state == PlayerState.Hooked && !canBeGroundedWhileHooked)
-        {
-            DisableIsGrounded(); // Add a short timer to bring back isGrounded
-            return false;
-        }
-
         if (noIsGroundedTimer > 0f)
         {
             Vector2 start = transform.position + new Vector3(-(playerWidth / 2f), groundedRayHeightOffset, 0f);
@@ -280,86 +178,17 @@ public class PlayerController : MonoBehaviour
 
     void IsIdleLogic()
     {
-        if (canGrapple.Count == 0 || canGrapple.Peek())
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                // start shooting
-                grapplePointVelocity = ((Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position).normalized * grappleSpeed;
-                grapplePointVelocity += rb.velocity; // Add our velocity to it
-                grapplePoint = this.transform.position;
-                prevGrapplePoint = grapplePoint;
-                state = PlayerState.Shooting;
-                shotTimer = 0f; 
-                GrappleLaunchFeedback?.PlayFeedbacks();
-            }
-        }
     }
 
     void IsHookedLogic()
     {
         // update grapple dist to be minimum
-        grappleDist = Mathf.Min(grappleDist, Vector2.Distance(transform.position, grapplePoint));
     }
 
     void IsShootingLogic() { }
 
     void IsShootingPhysicsLogic()
     {
-        shotTimer += Time.fixedDeltaTime;
-        var before = grapplePoint;
-        if (shotTimer >= grappleGravityDelay)
-            grapplePoint.y -= grappleGravity * Time.fixedDeltaTime;
-        grapplePoint += grapplePointVelocity * Time.fixedDeltaTime;
-
-        // check if we hit something
-        //var hit = Physics2D.Raycast(grapplePoint, grapplePointVelocity.normalized, (grapplePointVelocity * Time.fixedDeltaTime).magnitude, grappleLayer);
-        // Raycast from Before to GrapplePoint
-        var hit = Physics2D.Raycast(before, grapplePoint - before, (grapplePoint - before).magnitude, grappleLayer);
-        if (hit != default)
-        {
-            bool attach = true;
-
-            // check if we hit an interactor
-            if (hit.collider.TryGetComponent<IGrappleInteractor>(out var interactor))
-            {
-                attach = interactor.Interact(this, hit);
-                if (activeInteractor != null) // If we were attached to something else leave it
-                    activeInteractor.OnLeave(this);
-                activeInteractor = interactor;
-
-                if (state != PlayerState.Shooting)
-                {
-                    // The Interactor has changed our state so we need to return
-                    return;
-                }
-            }
-
-            // if we hit something and we are allowed to attach
-            if (attach)
-            {
-                state = PlayerState.Hooked;
-
-                grapplePoint = hit.point;
-                grappleHitNormal = hit.normal;
-
-                grappleDist = Vector2.Distance(transform.position, grapplePoint);
-                hookpointGO = new GameObject("HookPoint");
-                hookpointGO.transform.position = grapplePoint;
-                var otherrb = hookpointGO.AddComponent<Rigidbody2D>();
-                otherrb.isKinematic = true;
-                ropeJoint = hookpointGO.AddComponent<DistanceJoint2D>();
-                ropeJoint.distance = grappleDist;
-                ropeJoint.connectedBody = this.rb;
-                ropeJoint.maxDistanceOnly = true;
-                DisableIsGrounded();
-
-                GrappleHitFeedback?.PlayFeedbacks();
-            }
-        }
-
-        if (shotTimer >= grappleDragDelay)
-            grapplePointVelocity *= 1f - (grappleDrag * Time.fixedDeltaTime);
     }
 
     #endregion
@@ -374,13 +203,6 @@ public class PlayerController : MonoBehaviour
     public void SetState(PlayerState idle)
     {
         state = idle;
-    }
-
-    internal void DetachGrapple()
-    {
-        if (!IsGrappling) return;
-        state = PlayerState.Idle;
-        line.enabled = false;
     }
 
 
@@ -422,8 +244,6 @@ public class PlayerController : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(grapplePoint, 0.1f);
         // visualize isGrounded Ray
         Gizmos.color = Color.green;
         Vector2 start = transform.position + new Vector3(-(playerWidth / 2f), groundedRayHeightOffset, 0f);

@@ -7194,8 +7194,9 @@ GameObject:
   - component: {fileID: 8142213471756539346}
   - component: {fileID: 8142213471756539358}
   - component: {fileID: 8142213471756539357}
-  - component: {fileID: 1768925588}
   - component: {fileID: 1768925589}
+  - component: {fileID: 1184842009298936957}
+  - component: {fileID: 1768925588}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -7287,19 +7288,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visual: {fileID: 8142213471971868136}
   deathEffect: {fileID: 1193629882}
-  grappleLayer:
-    serializedVersion: 2
-    m_Bits: 320
-  grappleIcon: {fileID: 8142213470927386959}
-  grappleSpeed: 75
-  grappleGravity: 9
-  grappleGravityDelay: 0.1
-  grappleDrag: 10
-  grappleDragDelay: 0.075
-  grappleForce: 25
-  GrappleLaunchFeedback: {fileID: 3804706410306469356}
-  GrappleHitFeedback: {fileID: 8545095976345036418}
-  ropeMaterial: {fileID: 2100000, guid: 4a7f4e5f2f5d77740a601cd749f66153, type: 2}
   groundLayer:
     serializedVersion: 2
     m_Bits: 384
@@ -7307,24 +7295,11 @@ MonoBehaviour:
   groundedRayLength: 0.12
   playerWidth: 0.5
   groundedRayHeightOffset: -0.25
-  canBeGroundedWhileHooked: 0
   groundSpeed: 8
   groundDrag: 2
   aidSpeed: 5
   airDrag: 0
   LandFeedback: {fileID: 5506779872055402926}
---- !u!114 &1768925588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8142213471756539356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ccef5769481267478124e48496b3b19, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1768925589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7342,6 +7317,43 @@ MonoBehaviour:
     m_Bits: 1024
   itemPickupRange: 1
   curItem: {fileID: 0}
+--- !u!114 &1184842009298936957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8142213471756539356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1edc109de18acd94080369665d623c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grappleLayer:
+    serializedVersion: 2
+    m_Bits: 320
+  grappleIcon: {fileID: 8142213470927386959}
+  grappleSpeed: 75
+  grappleGravity: 9
+  grappleGravityDelay: 0.1
+  grappleDrag: 10
+  grappleDragDelay: 0.075
+  grappleForce: 25
+  GrappleLaunchFeedback: {fileID: 0}
+  GrappleHitFeedback: {fileID: 0}
+  ropeMaterial: {fileID: 2100000, guid: 4a7f4e5f2f5d77740a601cd749f66153, type: 2}
+--- !u!114 &1768925588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8142213471756539356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ccef5769481267478124e48496b3b19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8142213471971868136
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,18 +8,16 @@ public class GrappleUnityAction : IGrappleInteractor
     public bool canAttach = true;
     public bool disconnect = false;
 
-    public override bool Interact(PlayerController player, RaycastHit2D hit)
+    public override bool Interact(RaycastHit2D hit)
     {
-        Debug.Log("Enter");
         action.Invoke();
-        if(disconnect)
-            player.SetState(PlayerController.PlayerState.Idle);
+        if (disconnect)
+            Grapple.Instance.DetatchGrapple();
         return canAttach;
     }
 
-    public override void OnLeave(PlayerController player)
+    public override void OnLeave()
     {
-        Debug.Log("Leave");
         leaveaction.Invoke();
     }
 }

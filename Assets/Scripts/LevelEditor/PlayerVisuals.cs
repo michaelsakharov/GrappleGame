@@ -127,15 +127,15 @@ public class PlayerVisuals : MonoBehaviour
         vel /= Time.deltaTime;
         prevPos = transform.position;
 
-        if (PlayerController.Instance.IsGrappling)
+        if (Grapple.Instance.State != Grapple.GrappleState.None)
         {
             // Set hand to be at some point along the Grappling direction
-            lH = (PlayerController.Instance.GrappleDirection.normalized * 8f);
+            lH = (Grapple.Instance.GrappleDirection.normalized * 8f);
 
             Vector2 pixelSize = new Vector2(scale / res.x, scale / res.y);
             Vector2 localOffset = new Vector2(lH.x * pixelSize.x, lH.y * pixelSize.y) / 2f;
             Vector2 worldSpacePosition = localOffset + (Vector2)transform.position;
-            PlayerController.Instance.line.SetPosition(1, worldSpacePosition);
+            Grapple.Instance.LineRenderer.SetPosition(1, worldSpacePosition);
 
             if (isFlipped)
                 lH.x *= -1;

@@ -3,11 +3,11 @@
 [RequireComponent(typeof(Collider2D))]
 public class GrappleStopper : IGrappleInteractor
 {
-    public override bool Interact(PlayerController player, RaycastHit2D hit)
+    public override bool Interact(RaycastHit2D hit)
     {
-        player.SetState(PlayerController.PlayerState.Idle);
+        Grapple.Instance.DetatchGrapple();
         return false; // Can never attach to this object
     }
 
-    public override void OnLeave(PlayerController player) { }
+    public override void OnLeave() { }
 }

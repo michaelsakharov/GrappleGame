@@ -5,13 +5,13 @@ public class GrappleBounce : IGrappleInteractor
 {
     public float bounceForce = 0.3f;
 
-    public override bool Interact(PlayerController player, RaycastHit2D hit)
+    public override bool Interact(RaycastHit2D hit)
     {
-        player.GrapplePointVelocity = Vector2.Reflect(player.GrapplePointVelocity, hit.normal);
-        player.GrapplePointVelocity *= 1.0f + bounceForce;
+        Grapple.Instance.GrapplePointVelocity = Vector2.Reflect(Grapple.Instance.GrapplePointVelocity, hit.normal);
+        Grapple.Instance.GrapplePointVelocity *= 1.0f + bounceForce;
         return false; // Return false to indicate that the grapple should not attatch to this object
     }
 
     // Since were bouncing the grapple, Leave happens when the grapple either hits a wall or the player releases the grapple button
-    public override void OnLeave(PlayerController player) { }
+    public override void OnLeave() { }
 }
