@@ -71,6 +71,7 @@ public static class GameManager
     /// <summary> Called when the player initializes </summary>
     public static void PlayerStart()
     {
+        levelTimer = 0;
         bestTimer = GetBestTime();
         doTimer = false;
     }
