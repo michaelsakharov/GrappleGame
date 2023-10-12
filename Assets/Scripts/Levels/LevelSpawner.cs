@@ -87,7 +87,7 @@ public class LevelSpawner : MonoBehaviour
 
             // spawn the tilemap
             tilemap.Deserialize(GameManager.CurrentLevel.tilemapData);
-            Chunk.UpdateAllImmediately();
+            tilemap.WaitForChunks();
             //tilemap.RefreshAll();
         }
     }

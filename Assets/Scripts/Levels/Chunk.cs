@@ -165,6 +165,8 @@ public class Chunk : MonoBehaviour
             }
 
             finishedUpdate = false;
+
+            Layer.tilemap.updatingChunkCounter--;
         }
     }
 
@@ -172,6 +174,7 @@ public class Chunk : MonoBehaviour
     {
         if (chunksToUpdate.Contains(this)) return false;
         chunksToUpdate.Add(this);
+        Layer.tilemap.updatingChunkCounter++;
         return true;
     }
 
@@ -183,6 +186,7 @@ public class Chunk : MonoBehaviour
             if (chunk == null) // Chunk was destroyed
             {
                 chunksToRemove.Add(null);
+                chunk.Layer.tilemap.updatingChunkCounter--; // something went wrong, cant update the chunk
                 continue;
             }
             if (chunk.isUpdating) continue; // Skip if chunk is already updating
@@ -197,11 +201,6 @@ public class Chunk : MonoBehaviour
         }
         foreach (var chunk in chunksToRemove)
             chunksToUpdate.Remove(chunk);
-    }
-
-    public static void UpdateAllImmediately()
-    {
-        // TODO: Implement
     }
 
     static void HandleChunkTask(Chunk chunk, Data snapshot)

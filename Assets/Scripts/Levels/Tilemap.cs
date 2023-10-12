@@ -13,6 +13,8 @@ public class Tilemap : MonoBehaviour
     public float ZOffset = 1;
     bool hasInitialize = false;
 
+    internal int updatingChunkCounter = 0;
+
     public void OnValidate()
     {
         foreach (var layer in Layers) layer.tilemap = this;
@@ -138,6 +140,20 @@ public class Tilemap : MonoBehaviour
             if (left != chunk) left.RequestUpdate();
             Chunk right = GetChunkFromTile(tile + Vector2Int.right, layer);
             if (right != chunk) right.RequestUpdate();
+        }
+    }
+
+    public void WaitForChunks()
+    {
+        // await all chunks to finish updating
+        while (updatingChunkCounter > 0)
+        {
+            // Dispatch chunk updates
+            Chunk.UpdateChunks();
+            // Force call all chunk LateUpdate() methods since unity doesn't do it since were blocking the main thread
+            foreach (var layer in Layers)
+                foreach (var chunk in layer.chunksCache.Values)
+                    chunk.LateUpdate();
         }
     }
 

@@ -121,7 +121,7 @@ public class Layer
     public bool ForceDisableColliders = false;
     public PhysicsMaterial2D DefaultPhysicsMaterial;
 
-    Dictionary<Vector2Int, Chunk> chunksCache;
+    internal Dictionary<Vector2Int, Chunk> chunksCache;
 
     [NonSerialized] public float opacity = 1f;
     internal GameObject GO;
