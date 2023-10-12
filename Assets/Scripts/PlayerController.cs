@@ -119,7 +119,7 @@ public class PlayerController : MonoBehaviour
 
         // load best timer
         if(GameManager.CurrentLevel != null)
-            bestTimer = PlayerPrefs.GetFloat("BestTime_" + GameManager.CurrentLevel.UniqueID, 0f);
+            bestTimer = GameManager.GetBestTime();
 
         curItem = null;
 
