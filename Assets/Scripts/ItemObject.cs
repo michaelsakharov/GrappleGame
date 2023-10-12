@@ -28,7 +28,7 @@ public abstract class ItemObject : MonoBehaviour
     {
         UpdateAim();
         if (!canPickup)
-            if(Vector3.Distance(this.transform.position, PlayerController.Instance.transform.position) > PlayerController.Instance.itemPickupRange*2f)
+            if(Vector3.Distance(this.transform.position, PlayerController.Instance.transform.position) > Inventory.Instance.itemPickupRange*2f)
                 canPickup = true;
     }
 

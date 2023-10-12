@@ -14,10 +14,6 @@ public class PlayerController : MonoBehaviour
     public GameObject visual;
     public GameObject deathEffect;
 
-    [Header("Items")]
-    public LayerMask itemLayer;
-    public float itemPickupRange = 1f;
-
     [Header("Grapple")]
     public LayerMask grappleLayer;
     public Transform grappleIcon;
@@ -65,9 +61,6 @@ public class PlayerController : MonoBehaviour
 
     BoxCollider2D col;
 
-    [HideInInspector]
-    public ItemObject curItem;
-
     public enum PlayerState { Idle, Hooked, Shooting, Dead, Finished }
     PlayerState state = PlayerState.Idle;
 
@@ -76,9 +69,6 @@ public class PlayerController : MonoBehaviour
     public Stack<bool> canGrapple = new Stack<bool>();
 
     public Rigidbody2D Rigidbody => rb;
-    public bool IsHoldingItem => curItem != null;
-    public Vector2 ItemDirection => curItem.AimDirection;
-    public ItemObject HeldItem => curItem;
     public PlayerState State => state;
     public bool IsGrounded => isGrounded;
     public bool IsGrappling => state == PlayerState.Hooked || state == PlayerState.Shooting;
@@ -106,7 +96,6 @@ public class PlayerController : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
 
-        curItem = null;
         // TODO: Ensure Tilemap has finished loading before doing this
         // Snap to ground take col size into account
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 2f, groundLayer);
@@ -125,6 +114,8 @@ public class PlayerController : MonoBehaviour
         moveDir.x = Mathf.Abs(moveDir.x) < Threshold ? 0 : Mathf.Sign(moveDir.x);
         moveDir.y = Mathf.Abs(moveDir.y) < Threshold ? 0 : Mathf.Sign(moveDir.y);
 
+        if (moveDir.x != 0 || moveDir.y != 0 || state == PlayerState.Shooting || state == PlayerState.Hooked)
+            GameManager.StartTimer();
 
         // check isGrounded
         isGrounded = CheckIsGrounded();
@@ -192,30 +183,6 @@ public class PlayerController : MonoBehaviour
         foreach (float f in gravityScalers.Values)
             gravityScale *= f;
         rb.gravityScale = gravityScale;
-
-        // Look for item
-        if(curItem == null)
-        {
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, itemPickupRange, itemLayer);
-            foreach (Collider2D col in colliders)
-            {
-                ItemObject item = col.GetComponent<ItemObject>();
-                if (item != null && item.canPickup)
-                {
-                    curItem = item;
-                    curItem.Pickup(this);
-                    break;
-                }
-            }
-        }
-        else
-        {
-            if (Input.GetButtonDown("ThrowItem"))
-            {
-                curItem.Throw((Vector2)(Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position).normalized);
-                curItem = null;
-            }
-        }
     }
 
     void FixedUpdate()
@@ -327,26 +294,15 @@ public class PlayerController : MonoBehaviour
                 GrappleLaunchFeedback?.PlayFeedbacks();
             }
         }
-        // Handle Item
-        if (curItem != null)
-            curItem.ItemUpdate();
     }
 
     void IsHookedLogic()
     {
         // update grapple dist to be minimum
         grappleDist = Mathf.Min(grappleDist, Vector2.Distance(transform.position, grapplePoint));
-        // Handle Item
-        if (curItem != null)
-            curItem.ItemUpdate();
     }
 
-    void IsShootingLogic()
-    {
-        // Handle Item
-        if (curItem != null)
-            curItem.ItemUpdate();
-    }
+    void IsShootingLogic() { }
 
     void IsShootingPhysicsLogic()
     {
@@ -429,7 +385,7 @@ public class PlayerController : MonoBehaviour
 
 
     void RestartLevel() => GameManager.RestartLevel();
-    void GM_FinishLevel() => GameManager.FinishLevel(levelTimer);
+    void GM_FinishLevel() => GameManager.FinishLevel();
 
     public void Kill()
     {

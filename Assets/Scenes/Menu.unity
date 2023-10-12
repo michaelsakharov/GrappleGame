@@ -3260,6 +3260,29 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &861498070 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4708369984483263453, guid: 60469992b11d5434b9cc1e53c586ce19, type: 3}
+  m_PrefabInstance: {fileID: 7725928763332472968}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &861498075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 861498070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 026ffe4515e5828438c9c2f18fc65e72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  levelTimerText: {fileID: 0}
+  bestLevelTimerText: {fileID: 0}
+  levelFinishUI: {fileID: 0}
+  finishLevelTimerText: {fileID: 0}
+  bestFinishLevelTimerText: {fileID: 0}
 --- !u!1 &1014638962
 GameObject:
   m_ObjectHideFlags: 0
@@ -10491,6 +10514,40 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1768925583 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8142213471756539356, guid: 60469992b11d5434b9cc1e53c586ce19, type: 3}
+  m_PrefabInstance: {fileID: 7725928763332472968}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1768925588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1768925583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ccef5769481267478124e48496b3b19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1768925589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1768925583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bcedfcd31f311c458d4abe297a57bdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  itemPickupRange: 1
+  curItem: {fileID: 0}
 --- !u!1001 &1769116170
 PrefabInstance:
   m_ObjectHideFlags: 0

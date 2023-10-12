@@ -155,7 +155,7 @@ public class PlayerVisuals : MonoBehaviour
             rF = rightFoot;
             lH = leftHand;
             rH = rightHand;
-            if (PlayerController.Instance.IsHoldingItem)
+            if (Inventory.IsHoldingItem)
                 HoldItem();
             lEMiddle = leftEarMiddle;
             rEMiddle = rightEarMiddle;
@@ -184,7 +184,7 @@ public class PlayerVisuals : MonoBehaviour
 
     void doBounce()
     {
-        if (!PlayerController.Instance.IsHoldingItem)
+        if (!Inventory.IsHoldingItem)
             ApplySpringPhysics(ref rH, rightHand, limbSpringStrength);
         else
             HoldItem();
@@ -201,7 +201,7 @@ public class PlayerVisuals : MonoBehaviour
 
     void HoldItem()
     {
-        rH = (PlayerController.Instance.ItemDirection.normalized * 8f);
+        rH = (Inventory.ItemDirection.normalized * 8f);
 
         Vector2 pixelSize = new Vector2(scale / res.x, scale / res.y);
         Vector2 localOffset = new Vector2(rH.x * pixelSize.x, rH.y * pixelSize.y) / 2f;
@@ -209,12 +209,12 @@ public class PlayerVisuals : MonoBehaviour
         // thats the pivot point of the item
         // so we need to offset the item to move the items Pivot/Offset to be the same as the hand
         // its in local space to the item
-        var offset = PlayerController.Instance.HeldItem.Offset;
-        if (PlayerController.Instance.ItemDirection.x < 0)
+        var offset = Inventory.HeldItem.Offset;
+        if (Inventory.ItemDirection.x < 0)
             offset.y *= -1;
-        Vector2 itemPivot = PlayerController.Instance.HeldItem.transform.TransformPoint(offset);
-        Vector2 itemOffset = itemPivot - (Vector2)PlayerController.Instance.HeldItem.transform.position;
-        PlayerController.Instance.HeldItem.transform.localPosition = localOffset - itemOffset;
+        Vector2 itemPivot = Inventory.HeldItem.transform.TransformPoint(offset);
+        Vector2 itemOffset = itemPivot - (Vector2)Inventory.HeldItem.transform.position;
+        Inventory.HeldItem.transform.localPosition = localOffset - itemOffset;
 
         // Flip this after for use in Rendering
         if (isFlipped)
