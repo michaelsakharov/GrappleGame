@@ -129,6 +129,21 @@ public class Tilemap : MonoBehaviour
         Vector2Int relativeTile = TileRelativeToChunk(worldTile);
         return chunk.data.GetTile(relativeTile);
     }
+    public void SetVariation(Vector2Int worldTile, byte variation, int layer)
+    {
+        Chunk chunk = CreateChunkFromTile(worldTile, layer);
+        Vector2Int relativeTile = TileRelativeToChunk(worldTile);
+        chunk.data.SetVariation(relativeTile, variation);
+        chunk.RequestUpdate();
+    }
+    public byte GetVariation(int x, int y, int layer) => GetVariation(new Vector2Int(x, y), layer);
+    public byte GetVariation(Vector2Int worldTile, int layer)
+    {
+        Chunk chunk = GetChunkFromTile(worldTile, layer);
+        if (chunk == null) return 0; // Chunk not loaded
+        Vector2Int relativeTile = TileRelativeToChunk(worldTile);
+        return chunk.data.GetVariation(relativeTile);
+    }
 
     public void SetColor(Vector2Int worldTile, Color32 color, int layer)
     {

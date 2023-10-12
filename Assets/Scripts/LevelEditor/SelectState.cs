@@ -3,65 +3,74 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 /// <summary> Records the state Prior to your change </summary>
-//public class UndoTiles : IUndo
-//{
-//    public IEnumerable<TileState.TrackTileChanges> tiles;
-//
-//    public UndoTiles(TileState.TrackTileChanges tiles)
-//    {
-//        this.tiles = new TileState.TrackTileChanges[] { tiles };
-//    }
-//
-//    public UndoTiles(IEnumerable<TileState.TrackTileChanges> tiles)
-//    {
-//        this.tiles = tiles;
-//    }
-//
-//    public Hashtable RecordState()
-//    {
-//        Hashtable hash = new();
-//
-//        for (int i = 0; i < targets.Count(); i++)
-//        {
-//            Transform target = targets.ElementAt(i);
-//            hash.Add(target, new TransformState(target));
-//        }
-//
-//        for (int i = 0; i < SelectState.selectedPositions.Count; i++)
-//            hash.Add(i, SelectState.selectedPositions[i]);
-//
-//        return hash;
-//    }
-//
-//    public void ApplyState(Hashtable values)
-//    {
-//        Dictionary<int, Vector2> positions = new();
-//        foreach (DictionaryEntry kvp in values)
-//        {
-//            if (kvp.Key is Transform target)
-//            {
-//                TransformState state = (TransformState)kvp.Value;
-//                target.position = state.position;
-//                target.rotation = state.rotation;
-//            }
-//            else if (kvp.Key is int)
-//            {
-//                positions.Add((int)kvp.Key, (Vector2)kvp.Value);
-//            }
-//        }
-//        SelectState.selectedPositions = new();
-//        //SelectState.selectedPositions.Add((Vector2)kvp.Value);
-//        // Sort by key
-//        foreach (var kvp in positions.OrderBy(x => x.Key))
-//            SelectState.selectedPositions.Add(kvp.Value);
-//    }
-//
-//    public void OnExitScope() { }
-//}
+public class UndoTiles : IUndo
+{
+    Tilemap tilemap;
+    int layer;
+    List<Vector2Int> tiles;
+    Hashtable? overriddenTiles = null;
+
+    public UndoTiles(Vector2Int tile, int layer, Tilemap tilemap)
+    {
+        this.tiles = new List<Vector2Int> { tile };
+        this.layer = layer;
+        this.tilemap = tilemap;
+    }
+
+    public UndoTiles(List<Vector2Int> tiles, int layer, Tilemap tilemap)
+    {
+        this.tiles = tiles;
+        this.layer = layer;
+        this.tilemap = tilemap;
+    }
+
+    public Hashtable RecordState()
+    {
+        if (overriddenTiles != null)
+        {
+            var result = overriddenTiles;
+            overriddenTiles = null;
+            return result;
+        }
+
+        Hashtable hash = new();
+        for (int i = 0; i < tiles.Count(); i++)
+        {
+            Vector2Int tile = tiles.ElementAt(i);
+            hash.Add(i + "_Tile", tilemap.GetTile(tile.x, tile.y, layer));
+            hash.Add(i + "_Variation", tilemap.GetVariation(tile.x, tile.y, layer));
+            hash.Add(i + "_Color", tilemap.GetColor(tile.x, tile.y, layer));
+        }
+        return hash;
+    }
+
+    public void ApplyState(Hashtable values)
+    {
+        for (int i = 0; i < tiles.Count(); i++)
+        {
+            Vector2Int tile = tiles.ElementAt(i);
+            tilemap.SetTile(tile, (byte)values[i + "_Tile"], layer);
+            tilemap.SetVariation(tile, (byte)values[i + "_Variation"], layer);
+            tilemap.SetColor(tile, (Color32)values[i + "_Color"], layer);
+        }
+    }
+
+    public void OnExitScope() { }
+
+    internal void SetValues(Hashtable hashtable, List<Vector2Int> tiles)
+    {
+        overriddenTiles = new Hashtable(hashtable);
+        // Extract tiles
+        this.tiles = new List<Vector2Int>(tiles);
+    }
+}
 
 /// <summary> Records the state Prior to your change </summary>
 public class UndoTransform : IUndo
@@ -377,8 +386,8 @@ public static class SelectState
             // Delete
             if (Input.GetKeyDown(KeyCode.Delete))
             {
+                var gos = selectedObjects.Select((x) => { return x.gameObject; }).ToArray();
                 Undo.RegisterState(new UndoSelection(), "Selection Changed");
-                var gos = selectedObjects.Select((x) => { return x.gameObject; });
                 selectedObjects.Clear();
                 selectedPositions.Clear();
                 Undo.RegisterState(new UndoDelete(gos), "Deleted Props");
@@ -582,13 +591,8 @@ public static class TileState
     public static bool isDragging = false;
     public static Vector2Int clickDragStart;
 
-    public struct TrackTileChanges
-    {
-        public byte prevTile;
-        public byte newTile;
-        public Vector2Int tilePos;
-        public int layer;
-    }
+    readonly static List<Vector2Int> paintedTiles = new();
+    readonly static Hashtable paintedTilesData = new();
 
     [EditorState(EditorState.Tiles, StateUpdate.Update)]
     public static void Update()
@@ -601,8 +605,29 @@ public static class TileState
             case Tools.Paint:
                 if (!LevelEditor.MouseOnUI && Input.GetMouseButton(0))
                 {
-                    LevelEditor.Instance.Tilemap.SetTile(tile, currentTile, currentLayer);
-                    LevelEditor.Instance.Tilemap.UpdateChunk(tile, currentLayer, false);
+                    var oldTile = LevelEditor.Instance.Tilemap.GetTile(tile, currentLayer);
+                    if (oldTile != currentTile)
+                    {
+                        //Undo.RegisterState(new UndoTiles(tile, currentLayer, LevelEditor.Instance.Tilemap), "Tile Paint");
+                        int i = paintedTiles.Count;
+                        paintedTiles.Add(tile);
+                        paintedTilesData.Add(i + "_Tile", LevelEditor.Instance.Tilemap.GetTile(tile.x, tile.y, currentLayer));
+                        paintedTilesData.Add(i + "_Variation", LevelEditor.Instance.Tilemap.GetVariation(tile.x, tile.y, currentLayer));
+                        paintedTilesData.Add(i + "_Color", LevelEditor.Instance.Tilemap.GetColor(tile.x, tile.y, currentLayer));
+                        LevelEditor.Instance.Tilemap.SetTile(tile, currentTile, currentLayer);
+                        LevelEditor.Instance.Tilemap.UpdateChunk(tile, currentLayer, false);
+                    }
+                }
+                if (paintedTiles.Count > 0)
+                {
+                    if (!LevelEditor.MouseOnUI && Input.GetMouseButtonUp(0))
+                    {
+                        var undo = new UndoTiles(null, currentLayer, LevelEditor.Instance.Tilemap);
+                        undo.SetValues(paintedTilesData, paintedTiles);
+                        Undo.RegisterState(undo, "Tile Paint");
+                        paintedTiles.Clear();
+                        paintedTilesData.Clear();
+                    }
                 }
                 break;
             case Tools.Line:
@@ -615,8 +640,9 @@ public static class TileState
                 {
                     isDragging = false;
 
-                    var line = GetCellsOnLine(clickDragStart, tile);
-                    foreach (var point in line)
+                    var tiles = GetCellsOnLine(clickDragStart, tile);
+                    Undo.RegisterState(new UndoTiles(tiles, currentLayer, LevelEditor.Instance.Tilemap), "Tile Line");
+                    foreach (var point in tiles)
                         LevelEditor.Instance.Tilemap.SetTile(point, currentTile, currentLayer, true);
                 }
                 else if (isDragging)
@@ -635,10 +661,15 @@ public static class TileState
 
                     if ((clickDragStart != tile))
                     {
-                        // For every tile from the start to the end, set the tile
+                        // Create Undo first
+                        List<Vector2Int> tiles = new List<Vector2Int>();
                         for (int x = Math.Min(clickDragStart.x, tile.x); x <= Math.Max(clickDragStart.x, tile.x); x++)
                             for (int y = Math.Min(clickDragStart.y, tile.y); y <= Math.Max(clickDragStart.y, tile.y); y++)
-                                LevelEditor.Instance.Tilemap.SetTile(new Vector2Int(x, y), currentTile, currentLayer, true);
+                                tiles.Add(new Vector2Int(x, y));
+                        Undo.RegisterState(new UndoTiles(tiles, currentLayer, LevelEditor.Instance.Tilemap), "Tile Rectangle");
+                        // For every tile from the start to the end, set the tile
+                        foreach (var point in tiles)
+                            LevelEditor.Instance.Tilemap.SetTile(point, currentTile, currentLayer, true);
                     }
                 }
                 else if (isDragging)
