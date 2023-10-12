@@ -232,7 +232,7 @@ public class LevelEditor : ImmediateModeShapeDrawer
     public void PlayTest()
     {
         var level = SerializeLevel();
-        level.isTest = true;
+        level.isPlayTesting = true;
         GameManager.PlayLevel(level);
     }
 

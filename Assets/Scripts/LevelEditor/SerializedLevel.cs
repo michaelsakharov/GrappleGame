@@ -19,7 +19,7 @@ public class SerializedLevel
         public float rotW;
     }
 
-    [NonSerialized] public bool isTest = false;
+    [NonSerialized] public bool isPlayTesting = false;
 
     public string UniqueID; // Becomes new every time the level is serialized to reset times and track information per level
 

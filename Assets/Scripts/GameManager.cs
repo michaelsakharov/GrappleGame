@@ -114,6 +114,7 @@ public static class GameManager
     public static void GoBackToLevelEditor()
     {
         if (CurrentLevel.isTest == false) throw new InvalidOperationException("Not in test mode!");
+        if (CurrentLevel.isPlayTesting == false) throw new InvalidOperationException("Not in test mode!");
         SceneManager.LoadScene(levelEditorScene);
     }
 
@@ -181,6 +182,7 @@ public static class GameManager
     static void HandleBestTime(string key, float currentTime)
     {
         if (CurrentLevel.isTest) return; // Don't save test times
+        if (CurrentLevel.isPlayTesting) return; // Don't save test times
         string fullKey = key + "_" + CurrentLevel.Name + "_" + CurrentLevel.UniqueID;
         float bestTime = PlayerPrefs.GetFloat(fullKey, float.MaxValue);
         if (currentTime < bestTime)

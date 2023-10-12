@@ -20,7 +20,7 @@ public class EnableIf : MonoBehaviour
             switch (Condition)
             {
                 case ConditionType.IsPlayTesting:
-                    condition = GameManager.CurrentLevel.isTest;
+                    condition = GameManager.CurrentLevel.isPlayTesting;
                     break;
 
                 case ConditionType.HasUnlockedCampaignLevel:
