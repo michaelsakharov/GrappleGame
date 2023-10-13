@@ -237,10 +237,13 @@ public class Tilemap : MonoBehaviour
         }
     }
 
+    public const short FORMAT_VERSION = 1;
+
     public byte[] Serialize()
     {
         using System.IO.MemoryStream ms = new System.IO.MemoryStream();
         using TileStream ts = new TileStream(ms);
+        ts.WriteInt16(FORMAT_VERSION); // Version
         foreach (var layer in Layers) layer.Serialize(ts);
         return ms.ToArray();
     }
@@ -251,6 +254,7 @@ public class Tilemap : MonoBehaviour
         Start();
         using System.IO.MemoryStream ms = new System.IO.MemoryStream(data);
         using TileStream ts = new TileStream(ms);
+        short version = ts.ReadInt16();
         foreach (var layer in Layers) layer.Deserialize(ts);
     }
 }
