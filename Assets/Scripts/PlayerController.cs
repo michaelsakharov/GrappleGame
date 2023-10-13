@@ -228,10 +228,11 @@ public class PlayerController : MonoBehaviour
         _grounded = grounded;
         if (grounded)
         {
-            // Just Landed
+            // Just Landed deduct velocities
+            _trimmedFrameVelocity *= (1.0f - Stats.LandVelocityDeduction);
+            SetVelocity(_trimmedFrameVelocity * (1.0f - Stats.LandVelocityDeduction));
             GroundedChanged?.Invoke(true, SmoothedVelocity.y);
             _currentGravityScale = 0f;
-            SetVelocity(_trimmedFrameVelocity);
             _constantForce.force = Vector2.zero;
             _coyoteUsable = true;
             _bufferedJumpUsable = true;

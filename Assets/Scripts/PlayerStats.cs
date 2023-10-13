@@ -21,6 +21,7 @@ public class PlayerStats : ScriptableObject
     public float AirAccelerationUpMultiplier = 0.5f;
     public float AirDirectionCorrectionMultiplier = 1.5f;
     public float MaxWalkableSlope = 50;
+    public float LandVelocityDeduction = 0.9f;
 
     // Jump
     [Header("Jump"), Space] public float BufferedJumpTime = 0.15f;
