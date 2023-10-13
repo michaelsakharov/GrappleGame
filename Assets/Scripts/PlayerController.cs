@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
     public enum PlayerState { Normal, Dead, Finished }
     PlayerState state = PlayerState.Normal;
 
-    public PlayerState State { get; private set; }
+    public PlayerState State => state;
     
     public Vector2 Up { get; private set; }
     public Vector2 Right { get; private set; }
