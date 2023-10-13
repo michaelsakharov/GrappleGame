@@ -7,7 +7,7 @@ public class PlayerBounce : IPlayerInteractor
 
     public override void Interact(PlayerController player, ContactPoint2D hit)
     {
-        player.Velocity += hit.normal * hit.normalImpulse * (1.0f + bounceForce);
+        player.AddForce(hit.normal * hit.normalImpulse * (1.0f + bounceForce));
     }
 
     public override void TriggerInteract(PlayerController player) { }

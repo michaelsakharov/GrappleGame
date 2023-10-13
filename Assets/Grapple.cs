@@ -59,10 +59,6 @@ public class Grapple : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (state != GrappleState.None)
-            GameManager.StartTimer();
-
-
 
         if (state == GrappleState.None) // Is Idle
         {
@@ -188,9 +184,12 @@ public class Grapple : MonoBehaviour
         else if (state == GrappleState.Hooked) // Is Hooked
         {
             // Grapple force
-            PlayerController.Instance.Rigidbody.AddForce((grapplePoint - (Vector2)transform.position).normalized * grappleForce);
+            PlayerController.Instance.AddForce((grapplePoint - (Vector2)transform.position).normalized * grappleForce);
             // apply a Rope force to stop the player exceeding rope length
             ropeJoint.distance = grappleDist;
+
+            // Cant be grounded while hooked
+            PlayerController.Instance.DisableIsGrounded(0.05f);
         }
     }
 

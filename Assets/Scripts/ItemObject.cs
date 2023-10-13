@@ -5,8 +5,8 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 [RequireComponent(typeof(Rigidbody2D))]
 public abstract class ItemObject : MonoBehaviour
 {
-    [NonSerialized] public PlayerController user;
     Rigidbody2D rb;
+    public bool isHeld { get; private set; }
     [NonSerialized] public bool canPickup = true;
 
     public GameObject visualObject;
@@ -20,7 +20,7 @@ public abstract class ItemObject : MonoBehaviour
         get
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            return mousePos - (Vector2)user.transform.position;
+            return mousePos - (Vector2)PlayerController.Instance.transform.position;
         }
     }
 
@@ -34,8 +34,7 @@ public abstract class ItemObject : MonoBehaviour
 
     public virtual void Pickup(PlayerController player)
     {
-        user = player;
-
+        isHeld = true;
         rb = rb != null ? rb : GetComponent<Rigidbody2D>();
 
         rb.isKinematic = true;
@@ -48,7 +47,7 @@ public abstract class ItemObject : MonoBehaviour
 
     void UpdateAim()
     {
-        if (DoAim() && user != null)
+        if (DoAim() && isHeld)
         {
             visualObject.transform.localScale = new Vector3(1, 1, 1);
             transform.right = AimDirection;
@@ -69,10 +68,10 @@ public abstract class ItemObject : MonoBehaviour
         rb.isKinematic = false;
         transform.localScale = Vector3.one; // reset scale
         transform.SetParent(null);
-        rb.velocity = user.Velocity + (direction * ThrowForce);
+        rb.velocity = PlayerController.Instance.Velocity + (direction * ThrowForce);
         rb.AddTorque(ThrowAngularForce, ForceMode2D.Impulse);
         canPickup = false;
-        user = null;
+        isHeld = false;
     }
 
 }

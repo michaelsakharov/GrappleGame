@@ -192,7 +192,7 @@ public class GunItem : ItemObject
         }
 
         // Ammo Display
-        if (user != null)
+        if (isHeld)
         {
             if (showCurrentAmmo && ammoText != null)
             {
@@ -268,7 +268,7 @@ public class GunItem : ItemObject
 
     void OnGUI()
     {
-        if (user == null) return;
+        if (!isHeld) return;
 
         // Crosshairs
         if (showCrosshair)
@@ -424,7 +424,7 @@ public class GunItem : ItemObject
 
     void ShotFX()
     {
-        user.Rigidbody.AddForce(-AimDirection * recoilForce, ForceMode2D.Impulse);
+        PlayerController.Instance.Rigidbody.AddForce(-AimDirection * recoilForce, ForceMode2D.Impulse);
 
         // Muzzle flash effects
         if (makeMuzzleEffects)

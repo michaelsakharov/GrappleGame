@@ -6,16 +6,16 @@ public class PlayerWater : IPlayerInteractor
 
     public override void Interact(PlayerController player, ContactPoint2D hit)
     {
-        player.dragAdders.Add(this, waterDensity);
+        player.DragAdders.Add(this, waterDensity);
     }
 
     public override void TriggerInteract(PlayerController player)
     {
-        player.dragAdders.Add(this, waterDensity);
+        player.DragAdders.Add(this, waterDensity);
     }
 
     public override void OnLeave(PlayerController player)
     {
-        player.dragAdders.Remove(this);
+        player.DragAdders.Remove(this);
     }
 }

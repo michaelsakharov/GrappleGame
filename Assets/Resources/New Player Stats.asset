@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7e2795f99aa76e4cbe2979f611a9178, type: 3}
+  m_Name: New Player Stats
+  m_EditorClassIdentifier: 
+  GroundFilter:
+    useTriggers: 0
+    useLayerMask: 0
+    useDepth: 0
+    useOutsideDepth: 0
+    useNormalAngle: 1
+    useOutsideNormalAngle: 0
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 384
+    minDepth: 0
+    maxDepth: 0
+    minNormalAngle: 22.5
+    maxNormalAngle: 112.5
+  LeftWallFilter:
+    useTriggers: 0
+    useLayerMask: 0
+    useDepth: 0
+    useOutsideDepth: 0
+    useNormalAngle: 1
+    useOutsideNormalAngle: 0
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 384
+    minDepth: 0
+    maxDepth: 0
+    minNormalAngle: -22.5
+    maxNormalAngle: 22.5
+  RightWallFilter:
+    useTriggers: 0
+    useLayerMask: 0
+    useDepth: 0
+    useOutsideDepth: 0
+    useNormalAngle: 1
+    useOutsideNormalAngle: 0
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 384
+    minDepth: 0
+    maxDepth: 0
+    minNormalAngle: 157.5
+    maxNormalAngle: 202.5
+  CeilingFilter:
+    useTriggers: 0
+    useLayerMask: 0
+    useDepth: 0
+    useOutsideDepth: 0
+    useNormalAngle: 1
+    useOutsideNormalAngle: 0
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 384
+    minDepth: 0
+    maxDepth: 0
+    minNormalAngle: -67.5
+    maxNormalAngle: -157.5
+  VerticalDeadZoneThreshold: 0.3
+  HorizontalDeadZoneThreshold: 0.1
+  BaseSpeed: 4
+  Acceleration: 40
+  Friction: 30
+  AirAcceleration: 5
+  AirAccelerationUpMultiplier: 1
+  DirectionCorrectionMultiplier: 3
+  MaxWalkableSlope: 50
+  BufferedJumpTime: 0.15
+  CoyoteTime: 0.15
+  JumpPower: 6
+  EndJumpEarlyExtraForceMultiplier: 0
+  MaxAirJumps: 0
+  AllowWalls: 1
+  WallJumpLayer:
+    serializedVersion: 2
+    m_Bits: 384
+  WallJumpInputLossTime: 0.5
+  RequireInputPush: 0
+  WallJumpPower: {x: 6, y: 6}
+  WallJumpSpringy: 1
+  WallSpringMultiplier: {x: 0.8, y: 0}
+  WallJumpSpringMax: {x: 15, y: 15}
+  WallSpringEnergyDissipation: 10
+  WallSpringEnergyMin: 1
+  WallFallAcceleration: 20
+  WallFallSpeed: 2
+  WallPopForce: 10
+  WallCoyoteTime: 0.15
+  WallDetectorRange: 0.1

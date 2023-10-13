@@ -56,7 +56,6 @@ public class PlayerVisuals : MonoBehaviour
     Vector2 prevPos = Vector2.zero;
     Vector2 vel = Vector2.zero;
     bool isFlipped = false;
-    bool hasHooked = false;
 
     private void OnValidate()
     {
@@ -91,11 +90,6 @@ public class PlayerVisuals : MonoBehaviour
     private void LateUpdate()
     {
         if (PlayerController.Instance == null) return;
-        if (!hasHooked)
-        {
-            PlayerController.Instance.OnImpact += OnImpact;
-            hasHooked = true;
-        }
 
         // do Mirror set out scale to -1
         //if (PlayerController.Instance.IsGrappling)
@@ -142,12 +136,12 @@ public class PlayerVisuals : MonoBehaviour
 
             doBounce();
         }
-        else if (!PlayerController.Instance.IsGrounded)
+        else if (!PlayerController.Instance.Grounded)
         {
             ApplySpringPhysics(ref lH, leftHand, limbSpringStrength);
             doBounce();
         }
-        else if (PlayerController.Instance.IsGrounded)
+        else if (PlayerController.Instance.Grounded)
         {
             b = body;
             h = head;
@@ -230,20 +224,23 @@ public class PlayerVisuals : MonoBehaviour
     void ApplySpringPhysics(ref Vector2 limbPosition, Vector2 targetPosition, float springStrength, float maxHorDist = 6, float maxVertDist = 6)
     {
         Vector2 displacement = targetPosition - limbPosition;
-        if (displacement.magnitude < 1.5)
-            displacement *= 0.0f;
 
         // Apply spring force
         Vector2 springForce = springStrength * displacement;
+        limbPosition = Vector2.MoveTowards(limbPosition, targetPosition, springForce.magnitude * Time.deltaTime);
 
         // Apply damping based on player's velocity
         Vector2 dampingForce = -vel * springStrength;
+        if(vel.x > 1f)
+            limbPosition.x += dampingForce.x * Time.deltaTime;
+        if (vel.y > 1f)
+            limbPosition.y += dampingForce.y * Time.deltaTime;
 
         // Calculate total force
-        Vector2 totalForce = springForce + dampingForce;
+        //Vector2 totalForce = springForce + dampingForce;
 
         // Update limb position based on the forces
-        limbPosition += totalForce * Time.deltaTime;
+        //limbPosition += totalForce * Time.deltaTime;
         //limbPosition = Vector2.MoveTowards(limbPosition, targetPosition, totalForce.magnitude * Time.deltaTime);
 
         // Distance was split into horizontal and vertical
