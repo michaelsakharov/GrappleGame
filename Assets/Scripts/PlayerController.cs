@@ -477,6 +477,8 @@ public class PlayerController : MonoBehaviour
 
         if (!_grounded)
         {
+            float prevEnergy = _rb.velocity.magnitude;
+
             var move = _frameInput.Move;
             if (move.y > 0) move.y *= Stats.AirAccelerationUpMultiplier;
             if (move.magnitude > 1) move.Normalize();
@@ -485,7 +487,11 @@ public class PlayerController : MonoBehaviour
             if (Vector3.Dot(_trimmedFrameVelocity, new Vector2(_frameInput.Move.x, 0)) < 0) 
                 move.x *= Stats.AirDirectionCorrectionMultiplier;
 
-            _rb.AddForce(Stats.AirAcceleration * move);
+            //_rb.AddForce(Stats.AirAcceleration * move);
+            _rb.velocity += Stats.AirAcceleration * move * Time.fixedDeltaTime;
+            // Keep the same amount of energy as before
+            _rb.velocity = _rb.velocity.normalized * prevEnergy;
+
             // normal movement is disabled when in the air
             return;
         }
