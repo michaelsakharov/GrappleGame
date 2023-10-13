@@ -487,10 +487,16 @@ public class PlayerController : MonoBehaviour
             if (Vector3.Dot(_trimmedFrameVelocity, new Vector2(_frameInput.Move.x, 0)) < 0) 
                 move.x *= Stats.AirDirectionCorrectionMultiplier;
 
-            //_rb.AddForce(Stats.AirAcceleration * move);
-            _rb.velocity += Stats.AirAcceleration * move * Time.fixedDeltaTime;
-            // Keep the same amount of energy as before
-            _rb.velocity = _rb.velocity.normalized * prevEnergy;
+            if (!Stats.ConservativeAirControl)
+            {
+                _rb.AddForce(Stats.AirAcceleration * move);
+            }
+            else
+            {
+                _rb.velocity += Stats.AirAcceleration * move * Time.fixedDeltaTime;
+                // Keep the same amount of energy as before
+                _rb.velocity = _rb.velocity.normalized * prevEnergy;
+            }
 
             // normal movement is disabled when in the air
             return;

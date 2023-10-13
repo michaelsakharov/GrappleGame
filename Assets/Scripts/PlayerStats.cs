@@ -20,6 +20,7 @@ public class PlayerStats : ScriptableObject
     public float AirAcceleration = 5;
     public float AirAccelerationUpMultiplier = 0.5f;
     public float AirDirectionCorrectionMultiplier = 1.5f;
+    public bool ConservativeAirControl = false;
     public float MaxWalkableSlope = 50;
     public float LandVelocityDeduction = 0.9f;
 
