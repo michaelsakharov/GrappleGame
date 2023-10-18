@@ -52,6 +52,9 @@ public static class Undo
     public static event Action undoStackModified = null;
     public static event Action redoStackModified = null;
 
+    public static bool CanUndo => undoStack.Count > 0;
+    public static bool CanRedo => redoStack.Count > 0;
+
     /**
      * Add a callback when an Undo action is performed.
      */

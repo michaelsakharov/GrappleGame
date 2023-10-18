@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnableIf : MonoBehaviour
 {
-    public enum ConditionType { IsPlayTesting, HasUnlockedCampaignLevel }
+    public enum ConditionType { IsPlayTesting, HasUnlockedCampaignLevel, LE_BGSelected, LE_GSelected, LE_FGSelected }
     public ConditionType Condition;
     public bool invert = false;
 

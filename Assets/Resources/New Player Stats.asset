@@ -77,6 +77,7 @@ MonoBehaviour:
   AirAcceleration: 5
   AirAccelerationUpMultiplier: 1
   AirDirectionCorrectionMultiplier: 1.5
+  ConservativeAirControl: 1
   MaxWalkableSlope: 50
   LandVelocityDeduction: 0.2
   BufferedJumpTime: 0.15

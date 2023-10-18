@@ -24443,7 +24443,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 154898725817787816}
-  m_LocalRotation: {x: -0.4999997, y: -0.5000004, z: 0.5000005, w: 0.49999937}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: -0.139, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -24451,7 +24451,7 @@ Transform:
   - {fileID: 154898726983974320}
   m_Father: {fileID: 154898727088905749}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 90}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &154898725817787821
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -46217,7 +46217,7 @@ MonoBehaviour:
   grappleGravityDelay: 0.1
   grappleDrag: 10
   grappleDragDelay: 0.075
-  grappleForce: 25
+  grappleForce: 27.5
   GrappleLaunchFeedback: {fileID: 0}
   GrappleHitFeedback: {fileID: 0}
   ropeMaterial: {fileID: 2100000, guid: 4a7f4e5f2f5d77740a601cd749f66153, type: 2}

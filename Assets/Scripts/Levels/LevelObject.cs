@@ -12,4 +12,5 @@ public class LevelObject : MonoBehaviour
     public bool CanBeDestroyed = true;
 
     public bool ShowInList = true;
+    public LevelEditor.Layer Layer = LevelEditor.Layer.Ground;
 }

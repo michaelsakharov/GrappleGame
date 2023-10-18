@@ -8,20 +8,35 @@ public class LevelEditorTilesSelector : MonoBehaviour
     public SelectType selectType;
     public int Value;
 
+    public GameObject tileSelectedObject;
+
+    private void Update()
+    {
+        if (tileSelectedObject != null && selectType == SelectType.Tile)
+        {
+            if (Value == TileState.currentTile)
+                tileSelectedObject.SetActive(true);
+            else
+                tileSelectedObject.SetActive(false);
+        }
+    }
+
     public void Select()
     {
         switch (selectType)
         {
             case SelectType.Layer:
-                TileState.currentLayer = Value;
+                LevelEditor.currentLayer = (LevelEditor.Layer)Value;
                 TileState.UpdateTilesList();
                 LevelEditor.Instance.Tilemap.RefreshAll();
+                SelectState.UpdatePropsList();
                 break;
             case SelectType.Tool:
                 TileState.currentTool = (TileState.Tools)Value;
                 break;
             case SelectType.Tile:
                 TileState.currentTile = (byte)Value;
+                LevelEditor.SnapTo(LevelEditor.Instance.tileTools, LevelEditor.Instance.tileBrowser, this.transform as RectTransform);
                 break;
             case SelectType.State:
                 EditorStateAttribute.Invoke(LevelEditor.Instance.state, StateUpdate.OnLeave);
@@ -42,7 +57,7 @@ public class LevelEditorTilesSelector : MonoBehaviour
 
     public void ToggleLayerOpacity(bool state)
     {
-        TileState.LayerOpacity = state;
+        LevelEditor.LayerOpacity = state;
         LevelEditor.Instance.Tilemap.RefreshAll();
     }
 }
