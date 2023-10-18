@@ -45,6 +45,17 @@ MonoBehaviour:
     PhysicsMaterial: {fileID: 0}
     VariationsCount: 1
     Position: {x: 2, y: 3}
-    BlendOverlap: 0
+    BlendOverlap: 1
+    Material: {fileID: 0}
+    GameObjectIdentifier: -1
+  - tileset: {fileID: 11400000}
+    Name: Grate Dupe
+    Type: 1
+    HasCollider: 0
+    ColliderTemplate: {fileID: 0}
+    PhysicsMaterial: {fileID: 0}
+    VariationsCount: 1
+    Position: {x: 0, y: 6}
+    BlendOverlap: 1
     Material: {fileID: 0}
     GameObjectIdentifier: -1
