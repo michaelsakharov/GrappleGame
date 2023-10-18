@@ -82,6 +82,7 @@ public class LevelEditor : ImmediateModeShapeDrawer
     public Transform loadContent;
 
     public GameObject[] LayerButtHighlights;
+    public GameObject[] TileEditorButts;
 
     public enum Layer { Background = 0, Ground = 1, Foreground = 2 }
     public static Layer currentLayer = Layer.Ground;
@@ -163,6 +164,10 @@ if (Input.GetKey(KeyCode.LeftControl))
 
         for (int i = 0; i < LayerButtHighlights.Length; i++)
             LayerButtHighlights[i].SetActive(i == (int)currentLayer);
+
+        for (int i = 0; i < TileEditorButts.Length; i++)
+            TileEditorButts[i].SetActive(state == EditorState.Tiles);
+
 
         EditorStateAttribute.Invoke(state, StateUpdate.Update);
     }

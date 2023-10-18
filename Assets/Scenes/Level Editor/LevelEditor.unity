@@ -1015,6 +1015,10 @@ MonoBehaviour:
   - {fileID: 796972492}
   - {fileID: 1280883475}
   - {fileID: 1716274229}
+  TileEditorButts:
+  - {fileID: 1153872026}
+  - {fileID: 1749148274}
+  - {fileID: 1361298601}
 --- !u!1 &157036998
 GameObject:
   m_ObjectHideFlags: 0
