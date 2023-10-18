@@ -164,6 +164,7 @@ public class Tilemap : MonoBehaviour
     public void UpdateChunk(Vector2Int tile, int layer, bool andNeighbors = true)
     {
         Chunk chunk = GetChunkFromTile(tile, layer);
+        if (chunk == null) return;
         chunk.RequestUpdate();
         if (andNeighbors)
         {
