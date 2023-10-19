@@ -140,7 +140,7 @@ public class LevelEditor : ImmediateModeShapeDrawer
 
         // Pressing space centers the camera to the center
         // TODO: Go to Player Spawn
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.F))
             Camera.main.transform.position = new Vector3(0, 0, -10f);
 
         // Undo Redo
@@ -181,10 +181,10 @@ if (Input.GetKey(KeyCode.LeftControl))
         float horizontal = Input.GetAxis("Horizontal");
         cam.transform.position += new Vector3(horizontal, vertical, 0) * moveSpeed * Time.deltaTime;
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(2) || Input.GetKeyDown(KeyCode.Space))
             camDragStart = cam.ScreenToWorldPoint(Input.mousePosition);
 
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButton(2) || Input.GetKey(KeyCode.Space))
         {
             var dragEnd = (Vector2)cam.ScreenToWorldPoint(Input.mousePosition);
             cam.transform.position -= (Vector3)(dragEnd - camDragStart);
@@ -196,6 +196,16 @@ if (Input.GetKey(KeyCode.LeftControl))
         {
             float scroll = Input.GetAxis("Mouse ScrollWheel");
             cam.orthographicSize = Mathf.Clamp(cam.orthographicSize - scroll * zoomSpeed, minZoom, maxZoom);
+        }
+    }
+
+    void OnGUI()
+    {
+        //GUI.Window(0, new Rect(10, 10, 200, 200), GUI.WindowFunction., "My Window");
+
+        if (GUI.Button(new Rect(10, 10, 150, 100), "I am a button"))
+        {
+            print("You clicked the button!");
         }
     }
 

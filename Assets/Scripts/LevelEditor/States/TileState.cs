@@ -10,6 +10,7 @@ public static class TileState
     public enum Tools { Paint, Line, Rectangle }
     public static Tools currentTool = Tools.Paint;
     public static byte currentTile = 0;
+    static byte placingTile = 0;
 
     public static bool isDragging = false;
     public static Vector2Int clickDragStart;
@@ -29,13 +30,20 @@ public static class TileState
         var mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
         var tile = LevelEditor.Instance.Tilemap.WorldToTile(mousePos);
 
+        bool isDown = (Input.GetMouseButton(0) || Input.GetMouseButton(1));
+        bool wentDown = (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1));
+        bool wentUp = (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1));
+
         switch (currentTool)
         {
             case Tools.Paint:
-                if (!LevelEditor.MouseOnUI && Input.GetMouseButton(0))
+                if (!LevelEditor.MouseOnUI && isDown)
                 {
+                    placingTile = currentTile;
+                    if (Input.GetMouseButton(1))
+                        placingTile = 0;
                     var oldTile = LevelEditor.Instance.Tilemap.GetTile(tile, (int)LevelEditor.currentLayer);
-                    if (oldTile != currentTile)
+                    if (oldTile != placingTile)
                     {
                         //Undo.RegisterState(new UndoTiles(tile, currentLayer, LevelEditor.Instance.Tilemap), "Tile Paint");
                         int i = paintedTiles.Count;
@@ -43,13 +51,13 @@ public static class TileState
                         paintedTilesData.Add(i + "_Tile", LevelEditor.Instance.Tilemap.GetTile(tile.x, tile.y, (int)LevelEditor.currentLayer));
                         paintedTilesData.Add(i + "_Variation", LevelEditor.Instance.Tilemap.GetVariation(tile.x, tile.y, (int)LevelEditor.currentLayer));
                         paintedTilesData.Add(i + "_Color", LevelEditor.Instance.Tilemap.GetColor(tile.x, tile.y, (int)LevelEditor.currentLayer));
-                        LevelEditor.Instance.Tilemap.SetTile(tile, currentTile, (int)LevelEditor.currentLayer, false);
+                        LevelEditor.Instance.Tilemap.SetTile(tile, placingTile, (int)LevelEditor.currentLayer, false);
                         LevelEditor.Instance.Tilemap.UpdateChunk(tile, (int)LevelEditor.currentLayer, true);
                     }
                 }
                 if (paintedTiles.Count > 0)
                 {
-                    if (!LevelEditor.MouseOnUI && Input.GetMouseButtonUp(0))
+                    if (!LevelEditor.MouseOnUI && wentUp)
                     {
                         var undo = new UndoTiles(null, (int)LevelEditor.currentLayer, LevelEditor.Instance.Tilemap);
                         undo.SetValues(paintedTilesData, paintedTiles);
@@ -60,31 +68,42 @@ public static class TileState
                 }
                 break;
             case Tools.Line:
-                if (!LevelEditor.MouseOnUI && Input.GetMouseButtonDown(0))
+                if (!LevelEditor.MouseOnUI && wentDown)
                 {
                     clickDragStart = tile;
                     isDragging = true;
+
+                    placingTile = currentTile;
+                    if (Input.GetMouseButton(1))
+                        placingTile = 0;
                 }
-                else if (isDragging && Input.GetMouseButtonUp(0))
+                else if (isDragging && wentUp)
                 {
                     isDragging = false;
 
                     var tiles = GetCellsOnLine(clickDragStart, tile);
                     Undo.RegisterState(new UndoTiles(tiles, (int)LevelEditor.currentLayer, LevelEditor.Instance.Tilemap), "Tile Line");
                     foreach (var point in tiles)
-                        LevelEditor.Instance.Tilemap.SetTile(point, currentTile, (int)LevelEditor.currentLayer, true);
+                    {
+                        LevelEditor.Instance.Tilemap.SetTile(point, placingTile, (int)LevelEditor.currentLayer, false);
+                        LevelEditor.Instance.Tilemap.UpdateChunk(point, (int)LevelEditor.currentLayer, true);
+                    }
                 }
                 else if (isDragging)
                 {
                 }
                 break;
             case Tools.Rectangle:
-                if (!LevelEditor.MouseOnUI && Input.GetMouseButtonDown(0))
+                if (!LevelEditor.MouseOnUI && wentDown)
                 {
                     clickDragStart = LevelEditor.Instance.Tilemap.WorldToTile(mousePos);
                     isDragging = true;
+
+                    placingTile = currentTile;
+                    if (Input.GetMouseButton(1))
+                        placingTile = 0;
                 }
-                else if (isDragging && Input.GetMouseButtonUp(0))
+                else if (isDragging && wentUp)
                 {
                     isDragging = false;
 
@@ -98,7 +117,10 @@ public static class TileState
                         Undo.RegisterState(new UndoTiles(tiles, (int)LevelEditor.currentLayer, LevelEditor.Instance.Tilemap), "Tile Rectangle");
                         // For every tile from the start to the end, set the tile
                         foreach (var point in tiles)
-                            LevelEditor.Instance.Tilemap.SetTile(point, currentTile, (int)LevelEditor.currentLayer, true);
+                        {
+                            LevelEditor.Instance.Tilemap.SetTile(point, placingTile, (int)LevelEditor.currentLayer, false);
+                            LevelEditor.Instance.Tilemap.UpdateChunk(point, (int)LevelEditor.currentLayer, true);
+                        }
                     }
                 }
                 else if (isDragging)
@@ -237,6 +259,7 @@ public static class TileState
                 rect.height -= tileset.TileSize.y;
             Sprite sprite = Sprite.Create(tileset.Texture, rect, Vector2.one * 0.5f);
             button.transform.GetChild(1).GetComponent<Image>().sprite = sprite;
+            button.gameObject.SetActive(true);
         }
     }
 }

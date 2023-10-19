@@ -169,13 +169,13 @@ public class Tilemap : MonoBehaviour
         if (andNeighbors)
         {
             Chunk up = GetChunkFromTile(tile + Vector2Int.up, layer);
-            if (up != chunk) up.RequestUpdate();
+            if (up != null && up != chunk) up.RequestUpdate();
             Chunk down = GetChunkFromTile(tile + Vector2Int.down, layer);
-            if (down != chunk) down.RequestUpdate();
+            if (down != null && down != chunk) down.RequestUpdate();
             Chunk left = GetChunkFromTile(tile + Vector2Int.left, layer);
-            if (left != chunk) left.RequestUpdate();
+            if (left != null && left != chunk) left.RequestUpdate();
             Chunk right = GetChunkFromTile(tile + Vector2Int.right, layer);
-            if (right != chunk) right.RequestUpdate();
+            if (right != null && right != chunk) right.RequestUpdate();
         }
     }
 
