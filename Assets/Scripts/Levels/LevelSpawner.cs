@@ -51,9 +51,9 @@ public class LevelSpawner : MonoBehaviour
                     instance.transform.rotation = new Quaternion(prop.rotX, prop.rotY, prop.rotZ, prop.rotW);
 
                     // Disable all the components that shouldn't be active in play mode
+                    var lo = instance.GetComponent<LevelObject>();
                     if (isGame)
                     {
-                        var lo = instance.GetComponent<LevelObject>();
                         foreach (var component in lo.DisableInPlay)
                             component.enabled = false;
                         if(lo.DisableRenderers)
@@ -61,6 +61,12 @@ public class LevelSpawner : MonoBehaviour
                             foreach (var renderer in instance.GetComponentsInChildren<Renderer>())
                                 renderer.enabled = false;
                         }
+                    }
+                    else
+                    {
+                        // Set any rigidbody to kinematic while in Editor
+                        foreach (var rb in instance.GetComponentsInChildren<Rigidbody2D>())
+                            rb.isKinematic = true;
                     }
 
                     if (instance.CompareTag("Respawn"))
