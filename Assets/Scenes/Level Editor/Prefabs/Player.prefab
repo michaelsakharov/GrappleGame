@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 728541477}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_LocalScale: {x: 3, y: 3.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8142213471971868137}
@@ -120,7 +120,6 @@ MonoBehaviour:
   limbSpringStrength: 10
   bodySpringStrength: 5
   res: {x: 44, y: 56}
-  scale: 4
   angle: 0
   player: {fileID: 0}
   mat: {fileID: 2100000, guid: 7cd9ced201a57ca4ba325f889b38b649, type: 2}
