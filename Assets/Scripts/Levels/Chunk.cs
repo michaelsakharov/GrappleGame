@@ -260,6 +260,8 @@ public class Chunk : MonoBehaviour
 
     }
 
+    enum Dir { UpL=1, Up=2, UpR=4, Left=8, Right=16, DownL=32, Down=64, DownR=128 }
+
     static void AddOverlapBlock(Data data, MeshData meshData, Layer layer, Vector2Int tileCoord, float posX, float posY, int tileIdx, Tile tile, bool blend, Color32 color)
     {
         Vector2 tileUnit = new(layer.Tileset.tileTexUnitX, layer.Tileset.tileTexUnitY);
@@ -272,7 +274,7 @@ public class Chunk : MonoBehaviour
         void Add(float vX0, float vY0, float vX1, float vY1, float z, float uvMinX, float uvMinY, float uvMaxX, float uvMaxY)
             => meshData.AddSquare(tileIdx - 1, texPos, tileUnit, vX0, vY0, vX1, vY1, z, uvMinX, uvMinY, uvMaxX, uvMaxY, color);
 
-        bool Bit(byte position) => (bitmask & position) == position;
+        bool Bit(Dir position) => (bitmask & (int)position) == (int)position;
 
         // Base tile
         Add(posX, posY, cellMax, cellMin, z, 0.5f, 0.5f, 1.5f, 1.5f);
@@ -280,57 +282,58 @@ public class Chunk : MonoBehaviour
         // 1  | 2  |  4
         // 8  |tile|  16
         // 32 | 64 |  128
+        
 
         float halfSize = layer.tilemap.TileSize / 2f;
         
-        if (!Bit(1) && !Bit(8) && !Bit(2)) Add(posX - halfSize, cellMin, posX, cellMin + halfSize, z, 0f, 1.5f, 0.5f, 2f); //Left top corner
-        if (!Bit(4) && !Bit(16) && !Bit(2)) Add(cellMax, cellMin, cellMax + halfSize, cellMin + halfSize, z, 1.5f, 1.5f, 2f, 2f); //Right top corner
-        if (!Bit(32) && !Bit(8) && !Bit(64)) Add(posX - halfSize, posY - halfSize, posX, posY, z, 0f, 0f, 0.5f, 0.5f); //Left bottom corner
-        if (!Bit(128) && !Bit(16) && !Bit(64)) Add(cellMax, posY - halfSize, cellMax + halfSize, posY, z, 1.5f, 0f, 2f, 0.5f); //Right bottom corner
+        if (!Bit(Dir.UpL) && !Bit(Dir.Left) && !Bit(Dir.Up)) Add(posX - halfSize, cellMin, posX, cellMin + halfSize, z, 0f, 1.5f, 0.5f, 2f); //Left top corner
+        if (!Bit(Dir.UpR) && !Bit(Dir.Right) && !Bit(Dir.Up)) Add(cellMax, cellMin, cellMax + halfSize, cellMin + halfSize, z, 1.5f, 1.5f, 2f, 2f); //Right top corner
+        if (!Bit(Dir.DownL) && !Bit(Dir.Left) && !Bit(Dir.Down)) Add(posX - halfSize, posY - halfSize, posX, posY, z, 0f, 0f, 0.5f, 0.5f); //Left bottom corner
+        if (!Bit(Dir.DownR) && !Bit(Dir.Right) && !Bit(Dir.Down)) Add(cellMax, posY - halfSize, cellMax + halfSize, posY, z, 1.5f, 0f, 2f, 0.5f); //Right bottom corner
 
         if (blend)
         {
             //Left side
-            if (!Bit(8))
+            if (!Bit(Dir.Left))
             {
-                if (Bit(1)) Add(posX - halfSize, posY + halfSize, posX, cellMin, z, 0.5f, 2.5f, 1f, 3f); //Left Top exists
+                if (Bit(Dir.UpL)) Add(posX - halfSize, posY + halfSize, posX, cellMin, z, 0.5f, 2.5f, 1f, 3f); //Left Top exists
                 else Add(posX - halfSize, posY + halfSize, posX, cellMin, z, 0f, 1f, 0.5f, 1.5f); //Left Top empty
 
-                if (Bit(32)) Add(posX - halfSize, posY, posX, posY + halfSize, z, 0.5f, 2f, 1f, 2.5f); //Left Bottom exists
+                if (Bit(Dir.DownL)) Add(posX - halfSize, posY, posX, posY + halfSize, z, 0.5f, 2f, 1f, 2.5f); //Left Bottom exists
                 else Add(posX - halfSize, posY, posX, posY + halfSize, z, 0f, 0.5f, 0.5f, 1f); //Left Bottom empty
             }
 
             //Bottom side
-            if (!Bit(64))
+            if (!Bit(Dir.Down))
             {
-                if (Bit(32)) Add(posX, posY - halfSize, posX + halfSize, posY, z, 0f, 2.5f, 0.5f, 3f); //Left Bottom exists
+                if (Bit(Dir.DownL)) Add(posX, posY - halfSize, posX + halfSize, posY, z, 0f, 2.5f, 0.5f, 3f); //Left Bottom exists
                 else Add(posX, posY - halfSize, posX + halfSize, posY, z, 0.5f, 0f, 1f, 0.5f); //Left Bottom empty
 
-                if (!Bit(128)) Add(cellMax - halfSize, posY - halfSize, cellMax, posY, z, 1f, 0f, 1.5f, 0.5f); //Right Bottom empty
+                if (!Bit(Dir.DownR)) Add(cellMax - halfSize, posY - halfSize, cellMax, posY, z, 1f, 0f, 1.5f, 0.5f); //Right Bottom empty
             }
 
             //Right side
-            if (!Bit(16))
+            if (!Bit(Dir.Right))
             {
-                if (Bit(128)) Add(cellMax, posY, cellMax + halfSize, posY + halfSize, z, 0f, 2f, 0.5f, 2.5f); //Right Bottom exists
+                if (Bit(Dir.DownR)) Add(cellMax, posY, cellMax + halfSize, posY + halfSize, z, 0f, 2f, 0.5f, 2.5f); //Right Bottom exists
                 else Add(cellMax, posY, cellMax + halfSize, posY + halfSize, z, 1.5f, 0.5f, 2f, 1f); //Right Bottom empty
 
-                if (!Bit(4)) Add(cellMax, posY + halfSize, cellMax + halfSize, cellMin, z, 1.5f, 1f, 2f, 1.5f); //Right Top empty
+                if (!Bit(Dir.UpR)) Add(cellMax, posY + halfSize, cellMax + halfSize, cellMin, z, 1.5f, 1f, 2f, 1.5f); //Right Top empty
             }
 
             //Top side
-            if (!Bit(2))
+            if (!Bit(Dir.Up))
             {
-                if (!Bit(4)) Add(cellMax - halfSize, cellMin, cellMax, cellMin + halfSize, z, 1f, 1.5f, 1.5f, 2f); //Right Top empty
-                if (!Bit(1)) Add(posX, cellMin, posX + halfSize, cellMin + halfSize, z, 0.5f, 1.5f, 1f, 2f); //Left Top Empty
+                if (!Bit(Dir.UpR)) Add(cellMax - halfSize, cellMin, cellMax, cellMin + halfSize, z, 1f, 1.5f, 1.5f, 2f); //Right Top empty
+                if (!Bit(Dir.UpL)) Add(posX, cellMin, posX + halfSize, cellMin + halfSize, z, 0.5f, 1.5f, 1f, 2f); //Left Top Empty
             }
         }
         else
         {
-            if (!Bit(8)) Add(posX - halfSize, posY, posX, cellMin, z, 0f, 0.5f, 0.5f, 1.5f); //Left
-            if (!Bit(64)) Add(posX, posY - halfSize, cellMax, posY, z, 0.5f, 0f, 1.5f, 0.5f); //Bottom
-            if (!Bit(16)) Add(cellMax, posY, cellMax + halfSize, cellMin, z, 1.5f, 0.5f, 2f, 1.5f); //Right
-            if (!Bit(2)) Add(posX, cellMin, cellMax, cellMin + halfSize, z, 0.5f, 1.5f, 1.5f, 2f); //Top
+            if (!Bit(Dir.Left)) Add(posX - halfSize, posY, posX, cellMin, z, 0f, 0.5f, 0.5f, 1.5f); //Left
+            if (!Bit(Dir.Down)) Add(posX, posY - halfSize, cellMax, posY, z, 0.5f, 0f, 1.5f, 0.5f); //Bottom
+            if (!Bit(Dir.Right)) Add(cellMax, posY, cellMax + halfSize, cellMin, z, 1.5f, 0.5f, 2f, 1.5f); //Right
+            if (!Bit(Dir.Up)) Add(posX, cellMin, cellMax, cellMin + halfSize, z, 0.5f, 1.5f, 1.5f, 2f); //Top
         }
     }
 

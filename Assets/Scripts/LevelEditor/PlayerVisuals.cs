@@ -47,7 +47,7 @@ public class PlayerVisuals : MonoBehaviour
     Vector2 rEEnd = new Vector2Int(0, 0);
 
     public Vector2Int res;
-    public float scale = 1;
+    Vector2 startScale;
     public float angle;
     public Texture2D player;
     public Material mat;
@@ -85,6 +85,9 @@ public class PlayerVisuals : MonoBehaviour
         rEMiddle = rightEarMiddle;
         lEEnd = leftEarEnd;
         rEEnd = rightEarEnd;
+
+        startScale = transform.localScale;
+
         FixedUpdate();
     }
 
@@ -109,9 +112,9 @@ public class PlayerVisuals : MonoBehaviour
         }
 
         if (isFlipped)
-            this.transform.localScale = new Vector3(-scale, scale, scale);
+            this.transform.localScale = new Vector3(-startScale.x, startScale.y, 1f);
         else
-            this.transform.localScale = new Vector3(scale, scale, scale);
+            this.transform.localScale = new Vector3(startScale.x, startScale.y, 1f);
 
         vel.y = transform.position.y - prevPos.y;
         if (!isFlipped)
@@ -127,7 +130,7 @@ public class PlayerVisuals : MonoBehaviour
             // Set hand to be at some point along the Grappling direction
             lH = (Grapple.Instance.GrappleDirection.normalized * 8f);
 
-            Vector2 pixelSize = new Vector2(scale / res.x, scale / res.y);
+            Vector2 pixelSize = new Vector2(startScale.x / res.x, startScale.y / res.y);
             Vector2 localOffset = new Vector2(lH.x * pixelSize.x, lH.y * pixelSize.y) / 2f;
             Vector2 worldSpacePosition = localOffset + (Vector2)transform.position;
             Grapple.Instance.LineRenderer.SetPosition(1, worldSpacePosition);
@@ -198,7 +201,7 @@ public class PlayerVisuals : MonoBehaviour
     {
         rH = (Inventory.ItemDirection.normalized * 8f);
 
-        Vector2 pixelSize = new Vector2(scale / res.x, scale / res.y);
+        Vector2 pixelSize = new Vector2(startScale.x / res.x, startScale.y / res.y);
         Vector2 localOffset = new Vector2(rH.x * pixelSize.x, rH.y * pixelSize.y) / 2f;
         // PlayerController.Instance.HeldItem.Offset
         // thats the pivot point of the item
