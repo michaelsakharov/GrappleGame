@@ -268,6 +268,11 @@ public static class SelectState
         prop.name = prop.name.Replace("(Clone)", "");
         prop.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         prop.transform.position = new Vector3(prop.transform.position.x, prop.transform.position.y, 0);
+
+        // Set any rigidbody to kinematic while in Editor
+        foreach (var rb in prop.GetComponentsInChildren<Rigidbody2D>())
+            rb.isKinematic = true;
+
         isCreatingProp = true;
     }
 
