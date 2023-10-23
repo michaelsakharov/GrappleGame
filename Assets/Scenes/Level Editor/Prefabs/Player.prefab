@@ -104,7 +104,8 @@ MonoBehaviour:
   rightFoot: {x: 3, y: -6}
   leftHand: {x: 5, y: -1}
   rightHand: {x: -4, y: -1}
-  LimbTex: {fileID: 2800000, guid: 3788db24a6da4c94b85830ea98b5ea10, type: 3}
+  ArmTex: {fileID: 2800000, guid: 3788db24a6da4c94b85830ea98b5ea10, type: 3}
+  LegTex: {fileID: 2800000, guid: b0193eac238c90948b4b0d526b83359e, type: 3}
   leftEarRoot: {x: 2, y: 3}
   rightEarRoot: {x: -3, y: 3}
   leftEarMiddle: {x: 4, y: 12}

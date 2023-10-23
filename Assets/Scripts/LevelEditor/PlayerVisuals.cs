@@ -17,7 +17,8 @@ public class PlayerVisuals : MonoBehaviour
     public Vector2Int rightFoot = new Vector2Int(0, 0);
     public Vector2Int leftHand = new Vector2Int(0, 0);
     public Vector2Int rightHand = new Vector2Int(0, 0);
-    public Texture2D LimbTex;
+    public Texture2D ArmTex;
+    public Texture2D LegTex;
     [Space]
     public Vector2Int leftEarRoot = new Vector2Int(0, 0);
     public Vector2Int rightEarRoot = new Vector2Int(0, 0);
@@ -290,17 +291,17 @@ public class PlayerVisuals : MonoBehaviour
         var c = new Vector2Int((res.x / 2), (res.y / 2));
         Stamp(Body, c + new Vector2Int((int)b.x, (int)b.y));
         Stamp(HeadTex, c + new Vector2Int((int)h.x, (int)h.y));
-        Stamp(LimbTex, c + new Vector2Int((int)lF.x, (int)lF.y));
-        Stamp(LimbTex, c + new Vector2Int((int)rF.x, (int)rF.y));
-        Stamp(LimbTex, c + new Vector2Int((int)lH.x, (int)lH.y));
-        Stamp(LimbTex, c + new Vector2Int((int)rH.x, (int)rH.y));
+        Stamp(LegTex, c + new Vector2Int((int)lF.x, (int)lF.y));
+        Stamp(LegTex, c + new Vector2Int((int)rF.x, (int)rF.y));
+        Stamp(ArmTex, c + new Vector2Int((int)lH.x, (int)lH.y));
+        Stamp(ArmTex, c + new Vector2Int((int)rH.x, (int)rH.y));
 
         //float angle = Mathf.Atan2(vel.y, vel.x) * Mathf.Rad2Deg;
         //Stamp(EarTex, c + new Vector2Int((int)lE.x, (int)lE.y));
         //Stamp(BottomEarTex, c + new Vector2Int((int)rE.x, (int)rE.y));
         // Procedurally Draw Ears
         var headOf = new Vector2Int((int)h.x, (int)h.y);
-        var inside = new Color32(255, 106, 0, 255);
+        var inside = new Color32(243, 151, 31, 255);
         var neighbors = new Color32(247, 247, 247, 255);
         DrawLine(c + leftEarRoot + headOf, c + new Vector2Int((int)lEMiddle.x, (int)lEMiddle.y), inside, neighbors);
         DrawLine(c + rightEarRoot + headOf, c + new Vector2Int((int)rEMiddle.x, (int)rEMiddle.y), inside, neighbors);
