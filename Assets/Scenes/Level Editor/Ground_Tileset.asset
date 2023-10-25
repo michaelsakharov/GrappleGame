@@ -48,3 +48,14 @@ MonoBehaviour:
     BlendOverlap: 0
     Material: {fileID: 0}
     GameObjectIdentifier: 28878
+  - tileset: {fileID: 11400000}
+    Name: Lab
+    Type: 1
+    HasCollider: 1
+    ColliderTemplate: {fileID: 7328603103777702734, guid: 53cd0b06abdfcef4f8c7dd51fe516c89, type: 3}
+    PhysicsMaterial: {fileID: 0}
+    VariationsCount: 1
+    Position: {x: 0, y: 9}
+    BlendOverlap: 1
+    Material: {fileID: 0}
+    GameObjectIdentifier: 28878
